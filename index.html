@@ -72,7 +72,7 @@
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
-                    <p class="text-xs text-slate-500">Sinkronisasi real-time via Google Cloud & Firebase Firestore.</p>
+                    <p class="text-xs text-slate-500">Pemuatan instan dengan penyimpanan lokal teroptimasi.</p>
                 </div>
                 <button id="btnAddStudent" onclick="openAddModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
                     <i class="fa-solid fa-plus"></i><span>Tambah Mahasiswa</span>
@@ -293,7 +293,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // INISIALISASI FIRESTORE DENGAN OFFLINE PERSISTENCE (CACHING)
+        // INISIALISASI FIRESTORE DENGAN OFFLINE PERSISTENCE UNTUK MUAT CEPAT (NO LAG)
         const db = initializeFirestore(app, {
             localCache: persistentLocalCache({
                 tabManager: persistentMultipleTabManager()
@@ -313,7 +313,7 @@
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
+        // EXACT 41 MAHASISWA UTUH KELAS F SESUAI SPREADSHEET
         const defaultStudents = [
             { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
@@ -459,36 +459,36 @@
             loadCloudData();
         });
 
-        // KOLEKSI v8 UNTUK FITUR PENGINGAT KULIAH & CACHE OFFLINE
+        // MENGGUNAKAN KOLEKSI TETAP UTUH 'students_kelasF' (TIDAK BERUBAH-UBAH LAGI)
         async function loadCloudData() {
             try {
-                const studSnap = await getDocs(collection(db, "students_v8_kelasF"));
+                const studSnap = await getDocs(collection(db, "students_kelasF"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
                     for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v8_kelasF", s.id), s);
+                        await setDoc(doc(db, "students_kelasF", s.id), s);
                     }
                 }
 
-                const schedSnap = await getDocs(collection(db, "schedules_v8_kelasF"));
+                const schedSnap = await getDocs(collection(db, "schedules_kelasF"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
                     for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v8_kelasF", sch.id), sch);
+                        await setDoc(doc(db, "schedules_kelasF", sch.id), sch);
                     }
                 }
 
-                const assignSnap = await getDocs(collection(db, "assignments_v8_kelasF"));
+                const assignSnap = await getDocs(collection(db, "assignments_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
                     for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v8_kelasF", a.id), a);
+                        await setDoc(doc(db, "assignments_kelasF", a.id), a);
                     }
                 }
             } catch (err) {
@@ -539,7 +539,6 @@
             `).join('');
         }
 
-        // SISTEM PENGINGAT KULIAH HARI INI
         function checkTodayScheduleReminder() {
             const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const todayName = daysMap[new Date().getDay()];
@@ -590,7 +589,7 @@
             renderSchedule();
             checkTodayScheduleReminder();
 
-            await setDoc(doc(db, "schedules_v8_kelasF", item.id), item);
+            await setDoc(doc(db, "schedules_kelasF", item.id), item);
         }
 
         window.deleteSchedule = async function(id) {
@@ -598,7 +597,7 @@
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
                 checkTodayScheduleReminder();
-                await deleteDoc(doc(db, "schedules_v8_kelasF", id));
+                await deleteDoc(doc(db, "schedules_kelasF", id));
             }
         }
 
@@ -642,7 +641,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                await setDoc(doc(db, "students_v8_kelasF", s.id), s);
+                await setDoc(doc(db, "students_kelasF", s.id), s);
             }
         }
 
@@ -650,11 +649,10 @@
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
             for (let s of cachedStudents) {
-                await setDoc(doc(db, "students_v8_kelasF", s.id), s);
+                await setDoc(doc(db, "students_kelasF", s.id), s);
             }
         }
 
-        // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
@@ -755,7 +753,7 @@
             renderAssignments();
             checkDeadlineAlerts();
 
-            await setDoc(doc(db, "assignments_v8_kelasF", item.id), item);
+            await setDoc(doc(db, "assignments_kelasF", item.id), item);
         }
 
         window.deleteAssignment = async function(id) {
@@ -763,7 +761,7 @@
                 cachedAssignments = cachedAssignments.filter(a => a.id !== id);
                 renderAssignments();
                 checkDeadlineAlerts();
-                await deleteDoc(doc(db, "assignments_v8_kelasF", id));
+                await deleteDoc(doc(db, "assignments_kelasF", id));
             }
         }
 
@@ -833,7 +831,7 @@
             renderStudents();
             renderAttendance();
 
-            await setDoc(doc(db, "students_v8_kelasF", s.id), s);
+            await setDoc(doc(db, "students_kelasF", s.id), s);
         }
     </script>
 </body>
