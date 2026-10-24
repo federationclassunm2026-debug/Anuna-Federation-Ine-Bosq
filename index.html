@@ -158,7 +158,7 @@
             <div>
                 <label class="block text-xs font-semibold mb-1">Foto Profil (Galeri / Perangkat)</label>
                 <input type="file" id="photoInput" accept="image/*" class="text-xs w-full">
-                <p class="text-[10px] text-slate-400 mt-1">*Foto dikompres otomatis hingga sangat ringan.</p>
+                <p class="text-[10px] text-slate-400 mt-1">*Foto dikompres otomatis hingga &lt; 30KB agar respon instan.</p>
                 <img id="photoPreview" class="w-16 h-16 rounded-full object-cover mt-2 border-2 border-indigo-500">
             </div>
             <div>
@@ -279,17 +279,13 @@
         let isAdmin = false;
         let tempPhoto = "";
 
-        // FOTO DEFAULT KUSTOM YANG TELAH DIKOMPRES (Base64 Optimized)
-        const defaultAvatarPhoto = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA="; 
-        // Catatan: Gambar kompresi penuh telah di-embed ke dalam string di atas agar langsung tampil sempurna.
-
         const defaultStudents = Array.from({ length: 41 }, (_, i) => ({
             id: (i + 1).toString(),
             nim: `260101${(i + 1).toString().padStart(3, '0')}`,
             name: ["Ahmad Fauzi", "Anisa Rahmawati", "Bagus Setiawan", "Bunga Citra", "Cakra Pratama", "Dian Sastro", "Eko Prasetyo", "Fitriani Hasanah", "Gilang Ramadhan", "Hana Pertiwi", "Indra Wijaya", "Joko Susilo", "Kartika Putri", "Lestari Dewi", "M. Rizky Pratama", "Nabila Syakieb", "Oki Setiana", "Putri Ayu", "Qori Sandioriva", "Randi Pangalila", "Siti Nurhaliza", "Taufik Hidayat", "Utami Putri", "Vina Panduwinata", "Wahyu Hidayat", "Xaverius Tyo", "Yuni Shara", "Zainal Abidin", "Aditya Perkasa", "Bella Saphira", "Cinta Laura", "Dimas Anggara", "El Rumi", "Fuji Ananda", "Gading Marten", "Hesti Purwadinata", "Irfan Bachdim", "Jessica Mila", "Kaesang Pangarep", "Luna Maya", "Mawar de Jongh"][i] || `Mahasiswa ${i+1}`,
             role: i === 0 ? 'Keti' : (i === 1 ? 'Wakil Keti' : (i === 2 ? 'Sekretaris' : (i === 3 ? 'Bendahara' : 'Anggota'))),
             attendance: 'Hadir',
-            photo: defaultAvatarPhoto
+            photo: `https://randomuser.me/api/portraits/${i%2===0?'women':'men'}/${(i%70)+1}.jpg`
         }));
 
         const defaultAssignments = [
@@ -302,7 +298,7 @@
             { id: '3', day: 'Kamis', time: '13:30 - 16:00', course: 'Akuntansi Manajemen', room: 'Ruang 302' }
         ];
 
-        // LOGIKA KOMPRESI OTOMATIS UPLOAD FOTO
+        // LOGIKA KOMPRESI OTOMATIS GABUNGAN CANVAS (KOMPRES HINGGA RESOLUSI 120x120px)
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -393,8 +389,10 @@
             loadCloudData();
         });
 
+        // MUAT DATA DARI KOLEKSI TERPISAH (SANGAT CEPAT & TANPA LIMIT 1MB)
         async function loadCloudData() {
             try {
+                // Load Students
                 const studSnap = await getDocs(collection(db, "students_v2"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -405,6 +403,7 @@
                     }
                 }
 
+                // Load Schedules
                 const schedSnap = await getDocs(collection(db, "schedules_v2"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -415,6 +414,7 @@
                     }
                 }
 
+                // Load Assignments
                 const assignSnap = await getDocs(collection(db, "assignments_v2"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -441,7 +441,7 @@
             let grid = document.getElementById('studentsGrid');
             grid.innerHTML = cachedStudents.map(s => `
                 <div class="bg-white p-4 rounded-xl border shadow-sm flex items-center space-x-3">
-                    <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
+                    <img src="${s.photo}" class="w-12 h-12 rounded-full object-cover border">
                     <div class="flex-1 min-w-0">
                         <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
                         <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
@@ -510,7 +510,7 @@
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
                     <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
-                        <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                        <img src="${s.photo}" class="w-7 h-7 rounded-full object-cover">
                         <span>${s.name}</span>
                     </td>
                     <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
@@ -634,7 +634,7 @@
             document.getElementById('editId').value = "";
             document.getElementById('editName').value = "";
             document.getElementById('editNim').value = `260101${(cachedStudents.length+1).toString().padStart(3,'0')}`;
-            document.getElementById('photoPreview').src = defaultAvatarPhoto;
+            document.getElementById('photoPreview').src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150";
             tempPhoto = "";
             document.getElementById('studentModal').classList.remove('hidden');
         }
@@ -646,8 +646,8 @@
             document.getElementById('editName').value = s.name;
             document.getElementById('editNim').value = s.nim;
             document.getElementById('editRole').value = s.role;
-            document.getElementById('photoPreview').src = s.photo || defaultAvatarPhoto;
-            tempPhoto = s.photo || "";
+            document.getElementById('photoPreview').src = s.photo;
+            tempPhoto = s.photo;
             document.getElementById('studentModal').classList.remove('hidden');
         }
 
@@ -674,7 +674,7 @@
                 s = {
                     id: Date.now().toString(),
                     name, nim, role, attendance: 'Hadir',
-                    photo: tempPhoto || defaultAvatarPhoto
+                    photo: tempPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
                 };
                 cachedStudents.push(s);
             }
