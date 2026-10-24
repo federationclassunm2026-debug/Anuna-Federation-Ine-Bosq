@@ -291,7 +291,7 @@
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // DAFTAR LENGKAP 42 MAHASISWA KELAS F SPREADSHEET RESMI
+        // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
         const defaultStudents = [
             { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
@@ -333,8 +333,7 @@
             { id: "38", nim: "260901502069", name: "LILIS KARLINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "39", nim: "260901502070", name: "ARDIANSYAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "40", nim: "260901502072", name: "MEI LUNA INDA SARI S", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "42", nim: "260901502074", name: "YUKINO DHEA MAUDIVA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
+            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
         const defaultAssignments = [
@@ -438,36 +437,36 @@
             loadCloudData();
         });
 
-        // LOAD DATA UNTUK KELAS F (v5_kelasF)
+        // KOLEKSI v7 UNTUK MEMASTIKAN POPULASI Ulang PERBAIKAN 41 MAHASISWA
         async function loadCloudData() {
             try {
-                const studSnap = await getDocs(collection(db, "students_v5_kelasF"));
+                const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
                     for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v5_kelasF", s.id), s);
+                        await setDoc(doc(db, "students_v7_kelasF", s.id), s);
                     }
                 }
 
-                const schedSnap = await getDocs(collection(db, "schedules_v5_kelasF"));
+                const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
                     for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v5_kelasF", sch.id), sch);
+                        await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch);
                     }
                 }
 
-                const assignSnap = await getDocs(collection(db, "assignments_v5_kelasF"));
+                const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
                     for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v5_kelasF", a.id), a);
+                        await setDoc(doc(db, "assignments_v7_kelasF", a.id), a);
                     }
                 }
             } catch (err) {
@@ -541,14 +540,14 @@
             closeScheduleModal();
             renderSchedule();
 
-            await setDoc(doc(db, "schedules_v5_kelasF", item.id), item);
+            await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
 
         window.deleteSchedule = async function(id) {
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
-                await deleteDoc(doc(db, "schedules_v5_kelasF", id));
+                await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
 
@@ -592,7 +591,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                await setDoc(doc(db, "students_v5_kelasF", s.id), s);
+                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
@@ -600,7 +599,7 @@
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
             for (let s of cachedStudents) {
-                await setDoc(doc(db, "students_v5_kelasF", s.id), s);
+                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
@@ -705,7 +704,7 @@
             renderAssignments();
             checkDeadlineAlerts();
 
-            await setDoc(doc(db, "assignments_v5_kelasF", item.id), item);
+            await setDoc(doc(db, "assignments_v7_kelasF", item.id), item);
         }
 
         window.deleteAssignment = async function(id) {
@@ -713,7 +712,7 @@
                 cachedAssignments = cachedAssignments.filter(a => a.id !== id);
                 renderAssignments();
                 checkDeadlineAlerts();
-                await deleteDoc(doc(db, "assignments_v5_kelasF", id));
+                await deleteDoc(doc(db, "assignments_v7_kelasF", id));
             }
         }
 
@@ -783,7 +782,7 @@
             renderStudents();
             renderAttendance();
 
-            await setDoc(doc(db, "students_v5_kelasF", s.id), s);
+            await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
     </script>
 </body>
