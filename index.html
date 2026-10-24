@@ -60,9 +60,10 @@
                 <i class="fa-solid fa-clipboard-user"></i>
                 <span>Absensi Kelas</span>
             </button>
-            <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+            <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Pengumuman & Tugas</span>
+                <span id="assignmentBadge" class="hidden bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">!</span>
             </button>
         </div>
 
@@ -70,8 +71,8 @@
         <section id="tabContent-students" class="tab-content block">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa (41 Anggota)</h2>
-                    <p class="text-xs text-slate-500">Sinkronisasi real-time via Akun Google & Firebase.</p>
+                    <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
+                    <p class="text-xs text-slate-500">Sinkronisasi real-time via Google Cloud & Firebase Firestore.</p>
                 </div>
                 <button id="btnAddStudent" onclick="openAddModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
                     <i class="fa-solid fa-plus"></i><span>Tambah Mahasiswa</span>
@@ -87,7 +88,7 @@
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-800">Jadwal Kuliah Mingguan</h2>
+                        <h2 class="text-xl font-bold text-slate-800">Jadwal Kuliah Mingguan Kelas F</h2>
                         <p class="text-xs text-slate-500">Jadwal resmi perkuliahan S1 Akuntansi Kelas F 2026.</p>
                     </div>
                     <button id="btnAddSchedule" onclick="openAddScheduleModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
@@ -105,8 +106,8 @@
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-800">Pencatatan Absensi Mahasiswa</h2>
-                        <p class="text-xs text-slate-500">Kelola status kehadiran harian kelas.</p>
+                        <h2 class="text-xl font-bold text-slate-800">Pencatatan Absensi Kelas F</h2>
+                        <p class="text-xs text-slate-500">Kelola status kehadiran harian mahasiswa.</p>
                     </div>
                     <div id="adminAttendanceActions" class="hidden items-center space-x-2">
                         <button onclick="setBulkAttendance('Hadir')" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-semibold">Set Semua Hadir</button>
@@ -134,9 +135,18 @@
 
         <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
+            <!-- DEADLINE ALERT BANNER -->
+            <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg mt-0.5"></i>
+                <div class="text-xs">
+                    <h4 class="font-bold text-sm text-rose-900 mb-1">Pengingat Deadline Tugas Dekat!</h4>
+                    <p id="deadlineAlertText">Ada tugas yang mendekati batas waktu pengumpulan.</p>
+                </div>
+            </div>
+
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-xl font-bold text-slate-800">Pengumuman & Tugas Kelas</h2>
+                    <h2 class="text-xl font-bold text-slate-800">Pengumuman & Tugas Kelas F</h2>
                     <p class="text-xs text-slate-500">Informasi instruksi perkuliahan dan deadline tugas.</p>
                 </div>
                 <button id="btnAddAssignment" onclick="openAddAssignmentModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
@@ -158,7 +168,7 @@
             <div>
                 <label class="block text-xs font-semibold mb-1">Foto Profil (Galeri / Perangkat)</label>
                 <input type="file" id="photoInput" accept="image/*" class="text-xs w-full">
-                <p class="text-[10px] text-slate-400 mt-1">*Foto dikompres otomatis hingga &lt; 30KB agar respon instan.</p>
+                <p class="text-[10px] text-slate-400 mt-1">*Foto dikompres otomatis hingga sangat ringan (&lt; 20KB).</p>
                 <img id="photoPreview" class="w-16 h-16 rounded-full object-cover mt-2 border-2 border-indigo-500">
             </div>
             <div>
@@ -234,7 +244,7 @@
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1">Tenggat Waktu / Deadline</label>
-                <input type="text" id="assignDeadline" placeholder="Contoh: 28 Oktober 2026, 23:59 WITA" class="w-full px-3 py-2 border rounded-lg text-sm">
+                <input type="date" id="assignDeadlineDate" class="w-full px-3 py-2 border rounded-lg text-sm">
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1">Deskripsi Tambahan</label>
@@ -279,26 +289,49 @@
         let isAdmin = false;
         let tempPhoto = "";
 
-        const defaultStudents = Array.from({ length: 41 }, (_, i) => ({
-            id: (i + 1).toString(),
-            nim: `260101${(i + 1).toString().padStart(3, '0')}`,
-            name: ["Ahmad Fauzi", "Anisa Rahmawati", "Bagus Setiawan", "Bunga Citra", "Cakra Pratama", "Dian Sastro", "Eko Prasetyo", "Fitriani Hasanah", "Gilang Ramadhan", "Hana Pertiwi", "Indra Wijaya", "Joko Susilo", "Kartika Putri", "Lestari Dewi", "M. Rizky Pratama", "Nabila Syakieb", "Oki Setiana", "Putri Ayu", "Qori Sandioriva", "Randi Pangalila", "Siti Nurhaliza", "Taufik Hidayat", "Utami Putri", "Vina Panduwinata", "Wahyu Hidayat", "Xaverius Tyo", "Yuni Shara", "Zainal Abidin", "Aditya Perkasa", "Bella Saphira", "Cinta Laura", "Dimas Anggara", "El Rumi", "Fuji Ananda", "Gading Marten", "Hesti Purwadinata", "Irfan Bachdim", "Jessica Mila", "Kaesang Pangarep", "Luna Maya", "Mawar de Jongh"][i] || `Mahasiswa ${i+1}`,
-            role: i === 0 ? 'Keti' : (i === 1 ? 'Wakil Keti' : (i === 2 ? 'Sekretaris' : (i === 3 ? 'Bendahara' : 'Anggota'))),
-            attendance: 'Hadir',
-            photo: `https://randomuser.me/api/portraits/${i%2===0?'women':'men'}/${(i%70)+1}.jpg`
-        }));
+        // DEFAULT SUNFLOWER AVATAR (SVG ULTRA LIGHTWEIGHT)
+        const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
+
+        // DATA DIREKTORI MAHASISWA KELAS F 2026
+        const defaultStudents = [
+            { id: "1", nim: "260901501068", name: "Jubilant Elioney Pabalik", role: "Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "2", nim: "260901500062", name: "Nur Anisa Fitri", role: "Wakil Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "3", nim: "260901500002", name: "Andi Muhammad Farid Irsal", role: "Sekretaris", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "4", nim: "260901500004", name: "Siti Nurhaliza", role: "Bendahara", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "5", nim: "260901500012", name: "Ahmad Fauzi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "6", nim: "260901500018", name: "Bunga Citra Dewi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "7", nim: "260901500024", name: "Cakra Pratama", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "8", nim: "260901500030", name: "Dian Sastrowardoyo", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "9", nim: "260901500036", name: "Eko Prasetyo", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "10", nim: "260901500042", name: "Fitriani Hasanah", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "11", nim: "260901500050", name: "Gilang Ramadhan", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "12", nim: "260901500056", name: "Hana Pertiwi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "13", nim: "260901500064", name: "Indra Wijaya", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "14", nim: "260901500070", name: "Kartika Putri", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "15", nim: "260901500078", name: "M. Rizky Pratama", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "16", nim: "260901500084", name: "Nabila Syakieb", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "17", nim: "260901500090", name: "Putri Ayu Lestari", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "18", nim: "260901500096", name: "Randi Pangalila", "role": "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "19", nim: "260901501010", name: "Taufik Hidayat", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "20", nim: "260901501020", name: "Utami Putri", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "21", nim: "260901501030", name: "Wahyu Hidayat", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "22", nim: "260901501040", name: "Yuni Shara", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "23", nim: "260901501050", name: "Zainal Abidin", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "24", nim: "260901501060", name: "Aditya Perkasa", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "25", nim: "260901501070", name: "Cinta Laura", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
+        ];
 
         const defaultAssignments = [
-            { id: '1', course: 'Akuntansi Keuangan II', title: 'Analisis Laporan Keuangan PT. Maju', deadline: '28 Oktober 2026', desc: 'Dikumpulkan dalam format PDF via Google Drive kelas.' }
+            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
         ];
 
         const defaultSchedule = [
-            { id: '1', day: 'Senin', time: '08:00 - 10:30', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
-            { id: '2', day: 'Rabu', time: '10:30 - 13:00', course: 'Auditing 1', room: 'Lab Komputer' },
-            { id: '3', day: 'Kamis', time: '13:30 - 16:00', course: 'Akuntansi Manajemen', room: 'Ruang 302' }
+            { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
+            { id: '2', day: 'Rabu', time: '10:30 - 13:00 WITA', course: 'Auditing 1', room: 'Lab Komputer' },
+            { id: '3', day: 'Kamis', time: '13:30 - 16:00 WITA', course: 'Literasi Sains, Teknologi & Seni', room: 'Ruang 302' }
         ];
 
-        // LOGIKA KOMPRESI OTOMATIS GABUNGAN CANVAS (KOMPRES HINGGA RESOLUSI 120x120px)
+        // AUTO COMPRESSOR UNTUK FOTO UPLOAD
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -389,39 +422,36 @@
             loadCloudData();
         });
 
-        // MUAT DATA DARI KOLEKSI TERPISAH (SANGAT CEPAT & TANPA LIMIT 1MB)
+        // LOAD DATA UNTUK KELAS F (v4_kelasF)
         async function loadCloudData() {
             try {
-                // Load Students
-                const studSnap = await getDocs(collection(db, "students_v2"));
+                const studSnap = await getDocs(collection(db, "students_v4_kelasF"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
                     for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v2", s.id), s);
+                        await setDoc(doc(db, "students_v4_kelasF", s.id), s);
                     }
                 }
 
-                // Load Schedules
-                const schedSnap = await getDocs(collection(db, "schedules_v2"));
+                const schedSnap = await getDocs(collection(db, "schedules_v4_kelasF"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
                     for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v2", sch.id), sch);
+                        await setDoc(doc(db, "schedules_v4_kelasF", sch.id), sch);
                     }
                 }
 
-                // Load Assignments
-                const assignSnap = await getDocs(collection(db, "assignments_v2"));
+                const assignSnap = await getDocs(collection(db, "assignments_v4_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
                     for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v2", a.id), a);
+                        await setDoc(doc(db, "assignments_v4_kelasF", a.id), a);
                     }
                 }
             } catch (err) {
@@ -435,13 +465,15 @@
             renderSchedule();
             renderAttendance();
             renderAssignments();
+            checkDeadlineAlerts();
         }
 
         function renderStudents() {
             let grid = document.getElementById('studentsGrid');
+            document.getElementById('studentCountText').innerText = cachedStudents.length;
             grid.innerHTML = cachedStudents.map(s => `
                 <div class="bg-white p-4 rounded-xl border shadow-sm flex items-center space-x-3">
-                    <img src="${s.photo}" class="w-12 h-12 rounded-full object-cover border">
+                    <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
                     <div class="flex-1 min-w-0">
                         <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
                         <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
@@ -493,14 +525,14 @@
             closeScheduleModal();
             renderSchedule();
 
-            await setDoc(doc(db, "schedules_v2", item.id), item);
+            await setDoc(doc(db, "schedules_v4_kelasF", item.id), item);
         }
 
         window.deleteSchedule = async function(id) {
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
-                await deleteDoc(doc(db, "schedules_v2", id));
+                await deleteDoc(doc(db, "schedules_v4_kelasF", id));
             }
         }
 
@@ -510,7 +542,7 @@
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
                     <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
-                        <img src="${s.photo}" class="w-7 h-7 rounded-full object-cover">
+                        <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
                         <span>${s.name}</span>
                     </td>
                     <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
@@ -544,7 +576,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                await setDoc(doc(db, "students_v2", s.id), s);
+                await setDoc(doc(db, "students_v4_kelasF", s.id), s);
             }
         }
 
@@ -552,7 +584,36 @@
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
             for (let s of cachedStudents) {
-                await setDoc(doc(db, "students_v2", s.id), s);
+                await setDoc(doc(db, "students_v4_kelasF", s.id), s);
+            }
+        }
+
+        // SYSTEM PENGINGAT DEADLINE
+        function checkDeadlineAlerts() {
+            const today = new Date();
+            let urgentTasks = [];
+
+            cachedAssignments.forEach(a => {
+                if (a.deadlineDate) {
+                    const deadline = new Date(a.deadlineDate);
+                    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0 && diffDays <= 3) {
+                        urgentTasks.push(`${a.title} (${diffDays === 0 ? 'Hari ini!' : diffDays + ' hari lagi'})`);
+                    }
+                }
+            });
+
+            const alertContainer = document.getElementById('deadlineAlertContainer');
+            const alertText = document.getElementById('deadlineAlertText');
+            const badge = document.getElementById('assignmentBadge');
+
+            if (urgentTasks.length > 0) {
+                alertContainer.classList.remove('hidden');
+                badge.classList.remove('hidden');
+                alertText.innerText = `Segera selesaikan tugas berikut: ${urgentTasks.join(', ')}.`;
+            } else {
+                alertContainer.classList.add('hidden');
+                badge.classList.add('hidden');
             }
         }
 
@@ -562,23 +623,45 @@
                 container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada tugas atau pengumuman.</p>`;
                 return;
             }
-            container.innerHTML = cachedAssignments.map(a => `
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative">
-                    <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">${a.course}</span>
-                    <h3 class="font-bold text-slate-800 mt-2">${a.title}</h3>
-                    <p class="text-xs text-slate-600 mt-2">${a.desc}</p>
-                    <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs text-slate-500">
-                        <span><i class="fa-regular fa-clock mr-1"></i> Tenggat: <strong class="text-rose-600">${a.deadline}</strong></span>
-                        ${isAdmin ? `<button onclick="window.deleteAssignment('${a.id}')" class="text-rose-600 hover:underline font-semibold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>` : ''}
+
+            const today = new Date();
+
+            container.innerHTML = cachedAssignments.map(a => {
+                let badgeHTML = "";
+                if (a.deadlineDate) {
+                    const deadline = new Date(a.deadlineDate);
+                    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        badgeHTML = `<span class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">Lewat Deadline</span>`;
+                    } else if (diffDays <= 3) {
+                        badgeHTML = `<span class="bg-rose-100 text-rose-700 text-[10px] px-2 py-0.5 rounded font-bold animate-pulse">🔥 Deadline Dekat (${diffDays === 0 ? 'Hari ini' : diffDays + ' hari lagi'})</span>`;
+                    } else {
+                        badgeHTML = `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">${diffDays} Hari Lagi</span>`;
+                    }
+                }
+
+                return `
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">${a.course}</span>
+                            ${badgeHTML}
+                        </div>
+                        <h3 class="font-bold text-slate-800 mt-2">${a.title}</h3>
+                        <p class="text-xs text-slate-600 mt-2">${a.desc}</p>
+                        <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs text-slate-500">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Tenggat: <strong class="text-rose-600">${a.deadlineDate || 'Segera'}</strong></span>
+                            ${isAdmin ? `<button onclick="window.deleteAssignment('${a.id}')" class="text-rose-600 hover:underline font-semibold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>` : ''}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         window.openAddAssignmentModal = function() {
             document.getElementById('assignCourse').value = "";
             document.getElementById('assignTitle').value = "";
-            document.getElementById('assignDeadline').value = "";
+            document.getElementById('assignDeadlineDate').value = "";
             document.getElementById('assignDesc').value = "";
             document.getElementById('assignmentModal').classList.remove('hidden');
         }
@@ -590,7 +673,7 @@
         window.saveAssignmentData = async function() {
             let course = document.getElementById('assignCourse').value;
             let title = document.getElementById('assignTitle').value;
-            let deadline = document.getElementById('assignDeadline').value;
+            let deadlineDate = document.getElementById('assignDeadlineDate').value;
             let desc = document.getElementById('assignDesc').value;
 
             if (!title) return alert("Judul wajib diisi!");
@@ -598,21 +681,23 @@
             let item = {
                 id: Date.now().toString(),
                 course: course || "Pengumuman Kelas",
-                title, deadline: deadline || "Segera", desc
+                title, deadlineDate: deadlineDate || "", desc
             };
 
             cachedAssignments.push(item);
             closeAssignmentModal();
             renderAssignments();
+            checkDeadlineAlerts();
 
-            await setDoc(doc(db, "assignments_v2", item.id), item);
+            await setDoc(doc(db, "assignments_v4_kelasF", item.id), item);
         }
 
         window.deleteAssignment = async function(id) {
             if (confirm("Apakah Anda yakin ingin menghapus pengumuman/tugas ini?")) {
                 cachedAssignments = cachedAssignments.filter(a => a.id !== id);
                 renderAssignments();
-                await deleteDoc(doc(db, "assignments_v2", id));
+                checkDeadlineAlerts();
+                await deleteDoc(doc(db, "assignments_v4_kelasF", id));
             }
         }
 
@@ -633,8 +718,8 @@
             if (!isAdmin) return alert("Hanya Keti / Admin yang dapat menambah data.");
             document.getElementById('editId').value = "";
             document.getElementById('editName').value = "";
-            document.getElementById('editNim').value = `260101${(cachedStudents.length+1).toString().padStart(3,'0')}`;
-            document.getElementById('photoPreview').src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150";
+            document.getElementById('editNim').value = `26090150${(cachedStudents.length+1).toString().padStart(4,'0')}`;
+            document.getElementById('photoPreview').src = defaultAvatarPhoto;
             tempPhoto = "";
             document.getElementById('studentModal').classList.remove('hidden');
         }
@@ -646,8 +731,8 @@
             document.getElementById('editName').value = s.name;
             document.getElementById('editNim').value = s.nim;
             document.getElementById('editRole').value = s.role;
-            document.getElementById('photoPreview').src = s.photo;
-            tempPhoto = s.photo;
+            document.getElementById('photoPreview').src = s.photo || defaultAvatarPhoto;
+            tempPhoto = s.photo || "";
             document.getElementById('studentModal').classList.remove('hidden');
         }
 
@@ -674,7 +759,7 @@
                 s = {
                     id: Date.now().toString(),
                     name, nim, role, attendance: 'Hadir',
-                    photo: tempPhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
+                    photo: tempPhoto || defaultAvatarPhoto
                 };
                 cachedStudents.push(s);
             }
@@ -682,7 +767,7 @@
             renderStudents();
             renderAttendance();
 
-            await setDoc(doc(db, "students_v2", s.id), s);
+            await setDoc(doc(db, "students_v4_kelasF", s.id), s);
         }
     </script>
 </body>
