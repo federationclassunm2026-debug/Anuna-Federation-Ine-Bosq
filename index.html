@@ -293,7 +293,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // INISIALISASI FIRESTORE DENGAN OFFLINE PERSISTENCE UNTUK MUAT CEPAT (NO LAG)
+        // INISIALISASI FIRESTORE DENGAN OFFLINE PERSISTENCE YANG DIOPTIMALKAN
         const db = initializeFirestore(app, {
             localCache: persistentLocalCache({
                 tabManager: persistentMultipleTabManager()
@@ -313,7 +313,6 @@
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // EXACT 41 MAHASISWA UTUH KELAS F SESUAI SPREADSHEET
         const defaultStudents = [
             { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
@@ -459,7 +458,7 @@
             loadCloudData();
         });
 
-        // MENGHUBUNGKAN LANGSUNG KE students_v7_kelasF DI FIREBASE
+        // PEMUATAN DATA DIOPTIMALKAN MENGGUNAKAN PROMISE.ALL AGAR BEBAS LAG & INSTAN
         async function loadCloudData() {
             try {
                 const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
@@ -467,9 +466,7 @@
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
-                    for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v7_kelasF", s.id), s);
-                    }
+                    await Promise.all(defaultStudents.map(s => setDoc(doc(db, "students_v7_kelasF", s.id), s)));
                 }
 
                 const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
@@ -477,9 +474,7 @@
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
-                    for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch);
-                    }
+                    await Promise.all(defaultSchedule.map(sch => setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch)));
                 }
 
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
@@ -487,9 +482,7 @@
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
-                    for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v7_kelasF", a.id), a);
-                    }
+                    await Promise.all(defaultAssignments.map(a => setDoc(doc(db, "assignments_v7_kelasF", a.id), a)));
                 }
             } catch (err) {
                 console.error("Error loading cloud data:", err);
@@ -808,7 +801,7 @@
             let id = document.getElementById('editId').value;
             let name = document.getElementById('editName').value;
             let nim = document.getElementById('editNim').value;
-            let role = document.getElementById('editRole'].value;
+            let role = document.getElementById('editRole').value;
 
             if (!name) return alert("Nama wajib diisi!");
 
