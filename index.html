@@ -54,7 +54,7 @@
             </button>
             <button onclick="switchTab('schedule')" id="tabBtn-schedule" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
                 <i class="fa-solid fa-calendar-days"></i>
-                <span>Jadwal Kuliah</span>
+                <span>Jadwal & Pengingat Kuliah</span>
             </button>
             <button onclick="switchTab('attendance')" id="tabBtn-attendance" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
                 <i class="fa-solid fa-clipboard-user"></i>
@@ -72,7 +72,7 @@
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
-                    <p class="text-xs text-slate-500">Sinkronisasi real-time via Google Cloud & Firebase Firestore.</p>
+                    <p class="text-xs text-slate-500">Terhubung ke database `students_v7_kelasF` dengan pemuatan instan.</p>
                 </div>
                 <button id="btnAddStudent" onclick="openAddModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
                     <i class="fa-solid fa-plus"></i><span>Tambah Mahasiswa</span>
@@ -83,8 +83,21 @@
             </div>
         </section>
 
-        <!-- TAB 2: JADWAL KULIAH -->
+        <!-- TAB 2: JADWAL & PENGINGAT KULIAH -->
         <section id="tabContent-schedule" class="tab-content hidden">
+            <!-- PENGINGAT KULIAH HARI INI -->
+            <div id="todayScheduleAlert" class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-5 rounded-xl mb-6 shadow-sm hidden">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-base"></i></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitle">Pengingat Jadwal Hari Ini</h4>
+                        <div id="todayScheduleList" class="text-xs space-y-1 text-indigo-800">
+                            <!-- Dynamic today schedule items -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -291,7 +304,6 @@
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
         const defaultStudents = [
             { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
@@ -437,7 +449,7 @@
             loadCloudData();
         });
 
-        // KOLEKSI v7 UNTUK MEMASTIKAN POPULASI Ulang PERBAIKAN 41 MAHASISWA
+        // KOLEKSI v7 UNTUK MEMASTIKAN POPULASI ULANG 41 MAHASISWA
         async function loadCloudData() {
             try {
                 const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
@@ -445,9 +457,7 @@
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
-                    for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v7_kelasF", s.id), s);
-                    }
+                    await Promise.all(defaultStudents.map(s => setDoc(doc(db, "students_v7_kelasF", s.id), s)));
                 }
 
                 const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
@@ -455,9 +465,7 @@
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
-                    for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch);
-                    }
+                    await Promise.all(defaultSchedule.map(sch => setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch)));
                 }
 
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
@@ -465,9 +473,7 @@
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
-                    for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v7_kelasF", a.id), a);
-                    }
+                    await Promise.all(defaultAssignments.map(a => setDoc(doc(db, "assignments_v7_kelasF", a.id), a)));
                 }
             } catch (err) {
                 console.error("Error loading cloud data:", err);
@@ -478,6 +484,7 @@
         function renderAll() {
             renderStudents();
             renderSchedule();
+            checkTodayScheduleReminder(); // Memeriksa pengingat kuliah hari ini
             renderAttendance();
             renderAssignments();
             checkDeadlineAlerts();
@@ -516,6 +523,32 @@
             `).join('');
         }
 
+        // FUNGSI PENGINGAT JADWAL KULIAH HARI INI
+        function checkTodayScheduleReminder() {
+            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayName = daysMap[new Date().getDay()];
+
+            const todayClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            const alertBox = document.getElementById('todayScheduleAlert');
+            const alertTitle = document.getElementById('todayAlertTitle');
+            const listContainer = document.getElementById('todayScheduleList');
+
+            if (todayClasses.length > 0) {
+                alertBox.classList.remove('hidden');
+                alertTitle.innerText = `📅 Jadwal & Pengingat Kuliah Hari Ini (${todayName}):`;
+                listContainer.innerHTML = todayClasses.map(c => `
+                    <div class="flex items-center justify-between bg-white/80 p-2 rounded border border-indigo-100">
+                        <span><strong>${c.course}</strong> (${c.time})</span>
+                        <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
+                    </div>
+                `).join('');
+            } else {
+                alertBox.classList.remove('hidden');
+                alertTitle.innerText = `📅 Pengingat Kuliah Hari Ini (${todayName}):`;
+                listContainer.innerHTML = `<p class="italic text-slate-600">Tidak ada jadwal kuliah terjadwal untuk hari ini. Selamat beristirahat!</p>`;
+            }
+        }
+
         window.openAddScheduleModal = function() {
             document.getElementById('schedTime').value = "";
             document.getElementById('schedCourse').value = "";
@@ -539,6 +572,7 @@
             cachedSchedule.push(item);
             closeScheduleModal();
             renderSchedule();
+            checkTodayScheduleReminder();
 
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
@@ -547,6 +581,7 @@
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
+                checkTodayScheduleReminder();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -603,7 +638,7 @@
             }
         }
 
-        // SYSTEM PENGINGAT DEADLINE
+        // SISTEM PENGINGAT DEADLINE TUGAS
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
