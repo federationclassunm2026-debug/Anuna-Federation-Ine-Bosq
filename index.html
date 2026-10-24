@@ -289,36 +289,52 @@
         let isAdmin = false;
         let tempPhoto = "";
 
-        // DEFAULT SUNFLOWER AVATAR (SVG ULTRA LIGHTWEIGHT)
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // DATA DIREKTORI MAHASISWA KELAS F 2026
+        // DAFTAR LENGKAP 42 MAHASISWA KELAS F SPREADSHEET RESMI
         const defaultStudents = [
-            { id: "1", nim: "260901501068", name: "Jubilant Elioney Pabalik", role: "Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "2", nim: "260901500062", name: "Nur Anisa Fitri", role: "Wakil Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "3", nim: "260901500002", name: "Andi Muhammad Farid Irsal", role: "Sekretaris", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "4", nim: "260901500004", name: "Siti Nurhaliza", role: "Bendahara", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "5", nim: "260901500012", name: "Ahmad Fauzi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "6", nim: "260901500018", name: "Bunga Citra Dewi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "7", nim: "260901500024", name: "Cakra Pratama", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "8", nim: "260901500030", name: "Dian Sastrowardoyo", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "9", nim: "260901500036", name: "Eko Prasetyo", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "10", nim: "260901500042", name: "Fitriani Hasanah", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "11", nim: "260901500050", name: "Gilang Ramadhan", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "12", nim: "260901500056", name: "Hana Pertiwi", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "13", nim: "260901500064", name: "Indra Wijaya", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "14", nim: "260901500070", name: "Kartika Putri", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "15", nim: "260901500078", name: "M. Rizky Pratama", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "16", nim: "260901500084", name: "Nabila Syakieb", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "17", nim: "260901500090", name: "Putri Ayu Lestari", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "18", nim: "260901500096", name: "Randi Pangalila", "role": "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "19", nim: "260901501010", name: "Taufik Hidayat", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "20", nim: "260901501020", name: "Utami Putri", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "21", nim: "260901501030", name: "Wahyu Hidayat", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "22", nim: "260901501040", name: "Yuni Shara", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "23", nim: "260901501050", name: "Zainal Abidin", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "24", nim: "260901501060", name: "Aditya Perkasa", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "25", nim: "260901501070", name: "Cinta Laura", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
+            { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "3", nim: "260901500060", name: "ANGGITA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "4", nim: "260901500061", name: "YUNANDA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "5", nim: "260901500062", name: "NUR ANISA FITRI", role: "Wakil Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "6", nim: "260901500063", name: "AULIA ASWANI ASWAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "7", nim: "260901500064", name: "NUR ANNISA AZ ZAHRA RUSDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "8", nim: "260901500065", name: "JELITA CAHYADI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "9", nim: "260901500066", name: "MIFTAH AZIRAH QIRAINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "10", nim: "260901500067", name: "ASMIRANDA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "11", nim: "260901500068", name: "RIANY PRATIWI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "12", nim: "260901500069", name: "NURUL FAUSIAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "13", nim: "260901500070", name: "NASTHAIN S. BUNTA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "14", nim: "260901501068", name: "JUBILANT ELIONEY PABALIK", role: "Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "15", nim: "260901501069", name: "MUHAMMAD KHAIRIL ANWAR", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "16", nim: "260901501070", name: "ANDI MUH. FARID IRSAL", role: "Sekretaris", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "17", nim: "260901501071", name: "ROSALINA RINDING PADANG", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "18", nim: "260901501072", name: "NAFISAH AARIFAH ARIFUDDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "19", nim: "260901501074", name: "KEISHA SALSABILA MURSIDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "20", nim: "260901501075", name: "SYIFA NAFISAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "21", nim: "260901501076", name: "REZKY AMALYA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "22", nim: "260901501078", name: "NATALIA KRISSANTI NASIT SADIPUN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "23", nim: "260901501079", name: "NURHAFHIZAH HAMKA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "24", nim: "260901501080", name: "AMBAR WULANDARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "25", nim: "260901501081", name: "NUR AZIZA TUNNAFSIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "26", nim: "260901501082", name: "AL GIBRAN RAMADHAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "27", nim: "260901501083", name: "NUR FITRAH SALEH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "28", nim: "260901501087", name: "AMANDA NUR HASANAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "29", nim: "260901502060", name: "NABILA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "30", nim: "260901502061", name: "ARISKA DWI AULIA J", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "31", nim: "260901502062", name: "NAJLA MUTHIAH ASDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "32", nim: "260901502063", name: "NADYA AFIFAH PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "33", nim: "260901502064", name: "NATASYA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "34", nim: "260901502065", name: "EDITA NABILA AUDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "35", nim: "260901502066", name: "ANDI AULIA AZZAHRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "36", nim: "260901502067", name: "DAVINA ZAKIYAH PUTRI YUSLINRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "37", nim: "260901502068", name: "NADIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "38", nim: "260901502069", name: "LILIS KARLINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "39", nim: "260901502070", name: "ARDIANSYAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "40", nim: "260901502072", name: "MEI LUNA INDA SARI S", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "42", nim: "260901502074", name: "YUKINO DHEA MAUDIVA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
         const defaultAssignments = [
@@ -422,36 +438,36 @@
             loadCloudData();
         });
 
-        // LOAD DATA UNTUK KELAS F (v4_kelasF)
+        // LOAD DATA UNTUK KELAS F (v5_kelasF)
         async function loadCloudData() {
             try {
-                const studSnap = await getDocs(collection(db, "students_v4_kelasF"));
+                const studSnap = await getDocs(collection(db, "students_v5_kelasF"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
                     for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v4_kelasF", s.id), s);
+                        await setDoc(doc(db, "students_v5_kelasF", s.id), s);
                     }
                 }
 
-                const schedSnap = await getDocs(collection(db, "schedules_v4_kelasF"));
+                const schedSnap = await getDocs(collection(db, "schedules_v5_kelasF"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
                     for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v4_kelasF", sch.id), sch);
+                        await setDoc(doc(db, "schedules_v5_kelasF", sch.id), sch);
                     }
                 }
 
-                const assignSnap = await getDocs(collection(db, "assignments_v4_kelasF"));
+                const assignSnap = await getDocs(collection(db, "assignments_v5_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
                     for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v4_kelasF", a.id), a);
+                        await setDoc(doc(db, "assignments_v5_kelasF", a.id), a);
                     }
                 }
             } catch (err) {
@@ -525,14 +541,14 @@
             closeScheduleModal();
             renderSchedule();
 
-            await setDoc(doc(db, "schedules_v4_kelasF", item.id), item);
+            await setDoc(doc(db, "schedules_v5_kelasF", item.id), item);
         }
 
         window.deleteSchedule = async function(id) {
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
-                await deleteDoc(doc(db, "schedules_v4_kelasF", id));
+                await deleteDoc(doc(db, "schedules_v5_kelasF", id));
             }
         }
 
@@ -576,7 +592,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                await setDoc(doc(db, "students_v4_kelasF", s.id), s);
+                await setDoc(doc(db, "students_v5_kelasF", s.id), s);
             }
         }
 
@@ -584,7 +600,7 @@
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
             for (let s of cachedStudents) {
-                await setDoc(doc(db, "students_v4_kelasF", s.id), s);
+                await setDoc(doc(db, "students_v5_kelasF", s.id), s);
             }
         }
 
@@ -689,7 +705,7 @@
             renderAssignments();
             checkDeadlineAlerts();
 
-            await setDoc(doc(db, "assignments_v4_kelasF", item.id), item);
+            await setDoc(doc(db, "assignments_v5_kelasF", item.id), item);
         }
 
         window.deleteAssignment = async function(id) {
@@ -697,7 +713,7 @@
                 cachedAssignments = cachedAssignments.filter(a => a.id !== id);
                 renderAssignments();
                 checkDeadlineAlerts();
-                await deleteDoc(doc(db, "assignments_v4_kelasF", id));
+                await deleteDoc(doc(db, "assignments_v5_kelasF", id));
             }
         }
 
@@ -767,7 +783,7 @@
             renderStudents();
             renderAttendance();
 
-            await setDoc(doc(db, "students_v4_kelasF", s.id), s);
+            await setDoc(doc(db, "students_v5_kelasF", s.id), s);
         }
     </script>
 </body>
