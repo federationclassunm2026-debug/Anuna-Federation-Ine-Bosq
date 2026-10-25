@@ -20,7 +20,10 @@
     <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="p-2 bg-indigo-700 rounded-lg"><i class="fa-solid fa-graduation-cap text-xl text-amber-400"></i></div>
+                <div id="classLogoContainer" class="relative group cursor-pointer" title="Klik untuk ubah logo (Khusus Admin)" onclick="openLogoModal()">
+                    <img id="classLogoImg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234338ca'/><path d='M 50 15 L 85 35 L 50 55 L 15 35 Z' fill='%23fbbf24'/><path d='M 25 50 L 25 70 C 25 80 50 85 50 85 C 50 85 75 80 75 70 L 75 50 L 50 65 Z' fill='%236366f1'/></svg>" class="w-11 h-11 rounded-lg object-cover shadow border-2 border-indigo-500">
+                    <div id="logoOverlayEdit" class="absolute inset-0 bg-black/50 rounded-lg hidden items-center justify-center text-[10px] font-bold"><i class="fa-solid fa-pen"></i></div>
+                </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg">S1 Akuntansi - Kelas F (Federation) 2026</h1>
                     <p id="userStatusText" class="text-xs text-indigo-300">Memeriksa status akun...</p>
@@ -81,8 +84,6 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
-            
-            <!-- GRID WIDGET ATAS: PENGINGAT MATKUL & REKAP KETIDAKHADIRAN -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <!-- WIDGET HARI INI -->
                 <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
@@ -195,7 +196,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: REKAP KEHADIRAN PER MATA KULIAH -->
+        <!-- TAB 4: REKAP KEHADIRAN PER MATA KULIAH (DAPAT DIATUR ADMIN) -->
         <section id="tabContent-course-attendance" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
@@ -203,10 +204,13 @@
                         <h2 class="text-xl font-bold text-slate-800">Rekap Kehadiran Per Mata Kuliah</h2>
                         <p class="text-xs text-slate-500">Pantau akumulasi presensi mahasiswa per mata kuliah.</p>
                     </div>
-                    <div>
+                    <div class="flex flex-wrap items-center gap-2">
                         <select id="courseFilterSelect" onchange="renderCourseAttendance()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
                             <option value="Semua">Semua Mata Kuliah</option>
                         </select>
+                        <button id="btnManageCourses" onclick="openCourseManagerModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold items-center space-x-1 shadow">
+                            <i class="fa-solid fa-gear"></i><span>Kelola Matkul & Pertemuan</span>
+                        </button>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -289,6 +293,54 @@
         </section>
 
     </main>
+
+    <!-- MODAL UBAH LOGO KELAS -->
+    <div id="logoModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-lg">Ubah Logo Kelas F</h3>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Pilih Gambar Logo</label>
+                <input type="file" id="logoFileInput" accept="image/*" class="text-xs w-full">
+                <img id="logoPreview" class="w-20 h-20 rounded-xl object-cover mt-3 border-2 border-indigo-500 mx-auto shadow">
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button type="button" onclick="closeLogoModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveClassLogo()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Simpan Logo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KELOLA MATA KULIAH & PERTEMUAN -->
+    <div id="courseManagerModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <h3 class="font-bold text-lg">Kelola Mata Kuliah & Pertemuan</h3>
+            <p class="text-xs text-slate-500">Tambah daftar mata kuliah atau ubah standar total pertemuan untuk rekap.</p>
+            
+            <div class="bg-slate-50 p-4 rounded-xl border space-y-3">
+                <h4 class="text-xs font-bold uppercase text-indigo-700">Tambah Mata Kuliah Baru</h4>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Nama Mata Kuliah</label>
+                    <input type="text" id="newCourseName" placeholder="Contoh: Manajemen Keuangan" class="w-full px-3 py-2 border rounded-lg text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold mb-1">Total Pertemuan Semester</label>
+                    <input type="number" id="newCourseTotalMeetings" value="16" class="w-full px-3 py-2 border rounded-lg text-sm font-mono">
+                </div>
+                <button type="button" onclick="addNewCourseConfig()" class="w-full py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold">Tambah Matkul</button>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold uppercase text-slate-600 mb-2">Daftar Mata Kuliah Aktif</h4>
+                <div id="courseConfigList" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button type="button" onclick="closeCourseManagerModal()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-semibold">Selesai</button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL EDIT / TAMBAH MAHASISWA -->
     <div id="studentModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
@@ -472,14 +524,18 @@
         let cachedSchedule = [];
         let cachedMemories = [];
         let cachedCurhats = [];
+        let cachedCourses = [];
         let isAdmin = false;
         let currentUserDisplayName = "";
         let tempPhoto = "";
         let tempMemoryPhoto = "";
+        let tempLogoPhoto = "";
+        let classLogoUrl = "";
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
-        // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
+        const defaultLogoSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234338ca'/><path d='M 50 15 L 85 35 L 50 55 L 15 35 Z' fill='%23fbbf24'/><path d='M 25 50 L 25 70 C 25 80 50 85 50 85 C 50 85 75 80 75 70 L 75 50 L 50 65 Z' fill='%236366f1'/></svg>";
+
         const defaultStudents = [
             { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
             { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
@@ -534,8 +590,13 @@
         const defaultCurhats = [
             { id: '1', author: 'Anonim Federation', isAnon: true, title: 'Semangat Perkuliahan!', message: 'Semoga perkuliahan semester ini lancar dan nilai seluruh mahasiswa Kelas F memuaskan!', date: '2026-10-25' }
         ];
+        const defaultCoursesConfig = [
+            { id: 'c1', name: 'Akuntansi Keuangan II', totalMeetings: 16 },
+            { id: 'c2', name: 'Auditing 1', totalMeetings: 16 },
+            { id: 'c3', name: 'Literasi Sains, Teknologi & Seni', totalMeetings: 16 }
+        ];
 
-        // AUTO COMPRESSOR UNTUK FOTO UPLOAD MAHASISWA
+        // AUTO COMPRESSOR FOTO MAHASISWA
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -564,7 +625,36 @@
             }
         });
 
-        // AUTO COMPRESSOR UNTUK FOTO KENANGAN
+        // AUTO COMPRESSOR LOGO KELAS
+        document.getElementById('logoFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 150;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        tempLogoPhoto = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('logoPreview').src = tempLogoPhoto;
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // AUTO COMPRESSOR KENANGAN
         document.getElementById('memoryPhotoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -611,6 +701,8 @@
             const btnAddAssignment = document.getElementById('btnAddAssignment');
             const btnAddSchedule = document.getElementById('btnAddSchedule');
             const adminAttendanceActions = document.getElementById('adminAttendanceActions');
+            const btnManageCourses = document.getElementById('btnManageCourses');
+            const logoOverlayEdit = document.getElementById('logoOverlayEdit');
             const userStatusText = document.getElementById('userStatusText');
 
             if (user) {
@@ -626,11 +718,15 @@
                     btnAddAssignment.classList.remove('hidden'); btnAddAssignment.classList.add('flex');
                     btnAddSchedule.classList.remove('hidden'); btnAddSchedule.classList.add('flex');
                     adminAttendanceActions.classList.remove('hidden'); adminAttendanceActions.classList.add('flex');
+                    btnManageCourses.classList.remove('hidden'); btnManageCourses.classList.add('flex');
+                    logoOverlayEdit.classList.remove('hidden'); logoOverlayEdit.classList.add('flex');
                 } else {
                     isAdmin = false;
                     adminBanner.classList.add('hidden');
                     btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
                     btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
+                    btnManageCourses.classList.add('hidden');
+                    logoOverlayEdit.classList.add('hidden');
                 }
             } else {
                 currentUserDisplayName = "";
@@ -644,6 +740,8 @@
                 adminBanner.classList.add('hidden');
                 btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
                 btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
+                btnManageCourses.classList.add('hidden');
+                logoOverlayEdit.classList.add('hidden');
             }
             loadCloudData();
         });
@@ -669,15 +767,11 @@
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                } else {
-                    cachedAssignments = defaultAssignments;
                 }
 
                 const memSnap = await getDocs(collection(db, "memories_v7_kelasF"));
                 if (!memSnap.empty) {
                     cachedMemories = memSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                } else {
-                    cachedMemories = defaultMemories;
                 }
 
                 const curhatSnap = await getDocs(collection(db, "curhat_v7_kelasF"));
@@ -687,6 +781,25 @@
                     cachedCurhats = defaultCurhats;
                     for (let c of defaultCurhats) { await setDoc(doc(db, "curhat_v7_kelasF", c.id), c); }
                 }
+
+                const courseSnap = await getDocs(collection(db, "courses_config_v7_kelasF"));
+                if (!courseSnap.empty) {
+                    cachedCourses = courseSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedCourses = defaultCoursesConfig;
+                    for (let co of defaultCoursesConfig) { await setDoc(doc(db, "courses_config_v7_kelasF", co.id), co); }
+                }
+
+                const settingsSnap = await getDocs(collection(db, "settings_v7_kelasF"));
+                let logoDoc = settingsSnap.docs.find(d => d.id === 'classLogo');
+                if (logoDoc) {
+                    classLogoUrl = logoDoc.data().url || defaultLogoSvg;
+                } else {
+                    classLogoUrl = defaultLogoSvg;
+                    await setDoc(doc(db, "settings_v7_kelasF", 'classLogo'), { url: classLogoUrl });
+                }
+                document.getElementById('classLogoImg').src = classLogoUrl;
+
             } catch (err) {
                 console.error("Error loading cloud data:", err);
             }
@@ -699,12 +812,89 @@
             renderAttendance();
             updateCourseFilterOptions();
             renderCourseAttendance();
+            renderCourseConfigList();
             renderAssignments();
             renderMemories();
             renderCurhats();
             checkDeadlineAlerts();
             updateAbsentSummaryWidget();
             checkScheduleReminder();
+        }
+
+        // FUNGSI MODAL LOGO
+        window.openLogoModal = function() {
+            if (!isAdmin) return;
+            tempLogoPhoto = classLogoUrl;
+            document.getElementById('logoPreview').src = classLogoUrl;
+            document.getElementById('logoFileInput').value = "";
+            document.getElementById('logoModal').classList.remove('hidden');
+        }
+
+        window.closeLogoModal = function() {
+            document.getElementById('logoModal').classList.add('hidden');
+        }
+
+        window.saveClassLogo = async function() {
+            if (!tempLogoPhoto) return alert("Pilih gambar logo terlebih dahulu!");
+            classLogoUrl = tempLogoPhoto;
+            document.getElementById('classLogoImg').src = classLogoUrl;
+            closeLogoModal();
+            await setDoc(doc(db, "settings_v7_kelasF", 'classLogo'), { url: classLogoUrl });
+            alert("Logo kelas berhasil diperbarui!");
+        }
+
+        // FUNGSI MODAL KELOLA MATA KULIAH & PERTEMUAN
+        window.openCourseManagerModal = function() {
+            renderCourseConfigList();
+            document.getElementById('newCourseName').value = "";
+            document.getElementById('newCourseTotalMeetings').value = "16";
+            document.getElementById('courseManagerModal').classList.remove('hidden');
+        }
+
+        window.closeCourseManagerModal = function() {
+            document.getElementById('courseManagerModal').classList.add('hidden');
+        }
+
+        function renderCourseConfigList() {
+            const listContainer = document.getElementById('courseConfigList');
+            if (cachedCourses.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada mata kuliah.</p>`;
+                return;
+            }
+            listContainer.innerHTML = cachedCourses.map(c => `
+                <div class="flex items-center justify-between bg-white p-2.5 rounded-lg border">
+                    <div>
+                        <h5 class="font-bold text-xs text-slate-800">${c.name}</h5>
+                        <p class="text-[10px] text-slate-500 font-mono">Total Pertemuan: <strong>${c.totalMeetings}</strong></p>
+                    </div>
+                    <button onclick="window.deleteCourseConfig('${c.id}')" class="text-rose-600 hover:text-rose-800 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        window.addNewCourseConfig = async function() {
+            let name = document.getElementById('newCourseName').value;
+            let totalMeetings = parseInt(document.getElementById('newCourseTotalMeetings').value) || 16;
+            if (!name) return alert("Nama mata kuliah wajib diisi!");
+
+            let item = { id: 'c_' + Date.now(), name, totalMeetings };
+            cachedCourses.push(item);
+            document.getElementById('newCourseName').value = "";
+            renderCourseConfigList();
+            updateCourseFilterOptions();
+            renderCourseAttendance();
+
+            await setDoc(doc(db, "courses_config_v7_kelasF", item.id), item);
+        }
+
+        window.deleteCourseConfig = async function(id) {
+            if (confirm("Hapus mata kuliah ini dari rekap?")) {
+                cachedCourses = cachedCourses.filter(c => c.id !== id);
+                renderCourseConfigList();
+                updateCourseFilterOptions();
+                renderCourseAttendance();
+                await deleteDoc(doc(db, "courses_config_v7_kelasF", id));
+            }
         }
 
         function updateAbsentSummaryWidget() {
@@ -864,46 +1054,56 @@
 
         function updateCourseFilterOptions() {
             const filterSelect = document.getElementById('courseFilterSelect');
-            const courses = Array.from(new Set(cachedSchedule.map(s => s.course)));
             filterSelect.innerHTML = `<option value="Semua">Semua Mata Kuliah</option>` + 
-                courses.map(c => `<option value="${c}">${c}</option>`).join('');
+                cachedCourses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         }
 
         window.renderCourseAttendance = function() {
             const tbody = document.getElementById('courseAttendanceTableBody');
-            const selectedCourse = document.getElementById('courseFilterSelect').value;
-            tbody.innerHTML = cachedStudents.map((s, idx) => {
-                const totalPertemuan = 16;
-                let hadir = totalPertemuan;
-                let izinSakit = 0;
-                let alpa = 0;
-                if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
-                    izinSakit = 1; hadir -= 1;
-                } else if (s.attendance === 'Alpa') {
-                    alpa = 1; hadir -= 1;
-                }
-                const percentage = Math.round((hadir / totalPertemuan) * 100);
-                return `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
-                        <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
-                            <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
-                            <span>${s.name}</span>
-                        </td>
-                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
-                        <td class="p-3 text-center text-xs font-semibold text-indigo-700">${selectedCourse}</td>
-                        <td class="p-3 text-center font-mono text-xs">${totalPertemuan}</td>
-                        <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
-                        <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
-                        <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
-                        <td class="p-3 text-center">
-                            <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                                ${percentage}%
-                            </span>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+            const selectedCourseName = document.getElementById('courseFilterSelect').value;
+
+            let targetCourses = selectedCourseName === 'Semua' ? cachedCourses : cachedCourses.filter(c => c.name === selectedCourseName);
+            if (targetCourses.length === 0) targetCourses = [{ name: selectedCourseName, totalMeetings: 16 }];
+
+            let rowsHTML = "";
+            let counter = 1;
+
+            cachedStudents.forEach((s) => {
+                targetCourses.forEach(course => {
+                    const totalPertemuan = course.totalMeetings || 16;
+                    let hadir = totalPertemuan;
+                    let izinSakit = 0;
+                    let alpa = 0;
+                    if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
+                        izinSakit = 1; hadir -= 1;
+                    } else if (s.attendance === 'Alpa') {
+                        alpa = 1; hadir -= 1;
+                    }
+                    const percentage = Math.round((hadir / totalPertemuan) * 100);
+
+                    rowsHTML += `
+                        <tr class="hover:bg-slate-50">
+                            <td class="p-3 text-xs text-slate-400 font-mono">${counter++}</td>
+                            <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                                <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                                <span>${s.name}</span>
+                            </td>
+                            <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                            <td class="p-3 text-center text-xs font-semibold text-indigo-700">${course.name}</td>
+                            <td class="p-3 text-center font-mono text-xs">${totalPertemuan}</td>
+                            <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
+                            <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
+                            <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
+                            <td class="p-3 text-center">
+                                <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                    ${percentage}%
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+            tbody.innerHTML = rowsHTML;
         }
 
         function getAttendanceClass(att) {
