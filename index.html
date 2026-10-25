@@ -380,9 +380,8 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
-        const defaultAssignments = [
-            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
-        ];
+        // TUGAS LSTS DIHILANGKAN (DIKOSONGKAN)
+        const defaultAssignments = [];
 
         const defaultSchedule = [
             { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
@@ -807,7 +806,7 @@
         function renderAssignments() {
             let container = document.getElementById('assignmentsList');
             if (cachedAssignments.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada tugas atau pengumuman.</p>`;
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada tugas atau pengumuman saat ini.</p>`;
                 return;
             }
 
