@@ -60,17 +60,29 @@
                 <i class="fa-solid fa-clipboard-user"></i>
                 <span>Absensi Kelas</span>
             </button>
+            <button onclick="switchTab('course-attendance')" id="tabBtn-course-attendance" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Rekap Per Matkul</span>
+            </button>
             <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Pengumuman & Tugas</span>
                 <span id="assignmentBadge" class="hidden bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">!</span>
+            </button>
+            <button onclick="switchTab('memories')" id="tabBtn-memories" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-images text-amber-500"></i>
+                <span>Kenangan Federation</span>
+            </button>
+            <button onclick="switchTab('curhat')" id="tabBtn-curhat" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-comments text-rose-500"></i>
+                <span>Federation Curhat</span>
             </button>
         </div>
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
             
-            <!-- GRID WIDGET ATAS: PENGINGAT MATKUL & REKAP TIDAK HADIR -->
+            <!-- GRID WIDGET ATAS: PENGINGAT MATKUL & REKAP KETIDAKHADIRAN -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <!-- WIDGET HARI INI -->
                 <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
@@ -94,11 +106,11 @@
                     </div>
                 </div>
 
-                <!-- WIDGET REKAP TIDAK HADIR HARI INI -->
+                <!-- WIDGET REKAP KETIDAKHADIRAN -->
                 <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-1">
-                            <span class="bg-indigo-700 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-user-slash mr-1"></i> Status Kehadiran</span>
+                            <span class="bg-indigo-700 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Status Kelas</span>
                             <span id="absentCountBadge" class="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">0 Nihil</span>
                         </div>
                         <h4 class="text-xs font-bold mt-1 text-indigo-200">Tidak Hadir Hari Ini:</h4>
@@ -125,6 +137,16 @@
 
         <!-- TAB 2: JADWAL KULIAH -->
         <section id="tabContent-schedule" class="tab-content hidden">
+            <div id="scheduleReminderBanner" class="bg-amber-50 border border-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start space-x-3">
+                <div class="p-2.5 bg-amber-500 text-white rounded-xl shadow">
+                    <i class="fa-solid fa-bell text-base animate-bounce"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-amber-900 mb-1">Pengingat Jadwal Kuliah Hari Ini</h4>
+                    <p id="scheduleReminderText" class="text-xs text-amber-800">Memeriksa jadwal kuliah hari ini...</p>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -162,7 +184,7 @@
                                 <th class="p-3">Mahasiswa</th>
                                 <th class="p-3">NIM</th>
                                 <th class="p-3">Jabatan</th>
-                                <th class="p-3 text-center">Status Kehadiran</th>
+                                <th class="p-3 text-center">Status Kehadiran Harian</th>
                             </tr>
                         </thead>
                         <tbody id="attendanceTableBody" class="divide-y divide-slate-100">
@@ -173,9 +195,45 @@
             </div>
         </section>
 
-        <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 4: REKAP KEHADIRAN PER MATA KULIAH -->
+        <section id="tabContent-course-attendance" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Rekap Kehadiran Per Mata Kuliah</h2>
+                        <p class="text-xs text-slate-500">Pantau akumulasi presensi mahasiswa per mata kuliah.</p>
+                    </div>
+                    <div>
+                        <select id="courseFilterSelect" onchange="renderCourseAttendance()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
+                            <option value="Semua">Semua Mata Kuliah</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-xs border-b">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Mahasiswa</th>
+                                <th class="p-3">NIM</th>
+                                <th class="p-3 text-center">Mata Kuliah</th>
+                                <th class="p-3 text-center">Total Pertemuan</th>
+                                <th class="p-3 text-center">Hadir</th>
+                                <th class="p-3 text-center">Izin / Sakit</th>
+                                <th class="p-3 text-center">Alpa</th>
+                                <th class="p-3 text-center">Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseAttendanceTableBody" class="divide-y divide-slate-100">
+                            <!-- Rendered dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
-            <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
                 <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg mt-0.5"></i>
                 <div class="text-xs">
@@ -194,6 +252,38 @@
                 </button>
             </div>
             <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 6: KENANGAN FEDERATION -->
+        <section id="tabContent-memories" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Kenangan Federation S1 Akuntansi F</h2>
+                    <p class="text-xs text-slate-500">Dokumentasi momen kebersamaan, kegiatan kampus, dan galeri kelas.</p>
+                </div>
+                <button onclick="openAddMemoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
+                    <i class="fa-solid fa-camera"></i><span>Unggah Kenangan</span>
+                </button>
+            </div>
+            <div id="memoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 7: FEDERATION CURHAT -->
+        <section id="tabContent-curhat" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Federation Curhat & Aspirasi</h2>
+                    <p class="text-xs text-slate-500">Ruang bebas berekspresi untuk seluruh mahasiswa Kelas F. Pilih tampilkan nama atau anonim.</p>
+                </div>
+                <button onclick="openAddCurhatModal()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
+                    <i class="fa-solid fa-heart-pulse"></i><span>Tulis Curhatan</span>
+                </button>
+            </div>
+            <div id="curhatGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Rendered dynamically -->
             </div>
         </section>
@@ -297,6 +387,60 @@
         </div>
     </div>
 
+    <!-- MODAL UNGGAH KENANGAN -->
+    <div id="memoryModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-lg">Unggah Kenangan Federation</h3>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Foto Dokumentasi</label>
+                <input type="file" id="memoryPhotoInput" accept="image/*" class="text-xs w-full">
+                <img id="memoryPhotoPreview" class="w-full h-36 rounded-xl object-cover mt-2 border border-slate-200 hidden">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Judul / Momen</label>
+                <input type="text" id="memoryTitle" placeholder="Contoh: Makrab & Studi Kelompok" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Keterangan Singkat</label>
+                <input type="text" id="memoryDesc" placeholder="Contoh: Keseruan di Ruang Kuliah 302" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeMemoryModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveMemoryData()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Unggah</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TULIS CURHATAN FEDERATION -->
+    <div id="curhatModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-lg text-rose-700 flex items-center gap-2"><i class="fa-solid fa-heart-pulse"></i> Federation Curhat</h3>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Mode Identitas</label>
+                <select id="curhatMode" onchange="toggleCurhatAuthorInput()" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold bg-slate-50">
+                    <option value="Anonymous">🕶️ Kirim Secara Anonim (Tanpa Nama)</option>
+                    <option value="Public">👤 Kirim Dengan Nama Mahasiswa</option>
+                </select>
+            </div>
+            <div id="curhatAuthorBox" class="hidden">
+                <label class="block text-xs font-semibold mb-1">Nama Pengirim</label>
+                <input type="text" id="curhatAuthorName" placeholder="Tuliskan nama Anda..." class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Judul / Topik Curhatan</label>
+                <input type="text" id="curhatTitle" placeholder="Contoh: Tugas bertubi-tubi minggu ini..." class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Isi Curhatan / Ungkapan Perasaan</label>
+                <textarea id="curhatMessage" rows="4" placeholder="Tumpahkan perasaan atau saranmu di sini secara santun..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeCurhatModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveCurhatData()" class="px-4 py-2 bg-rose-600 text-white rounded-lg text-sm font-semibold">Kirim Curhatan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FIREBASE SDK & LOGIKA UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -326,8 +470,12 @@
         let cachedStudents = [];
         let cachedAssignments = [];
         let cachedSchedule = [];
+        let cachedMemories = [];
+        let cachedCurhats = [];
         let isAdmin = false;
+        let currentUserDisplayName = "";
         let tempPhoto = "";
+        let tempMemoryPhoto = "";
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
 
@@ -376,17 +524,18 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
-        const defaultAssignments = [
-            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
-        ];
-
+        const defaultAssignments = [];
+        const defaultMemories = [];
         const defaultSchedule = [
             { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
             { id: '2', day: 'Rabu', time: '10:30 - 13:00 WITA', course: 'Auditing 1', room: 'Lab Komputer' },
             { id: '3', day: 'Kamis', time: '13:30 - 16:00 WITA', course: 'Literasi Sains, Teknologi & Seni', room: 'Ruang 302' }
         ];
+        const defaultCurhats = [
+            { id: '1', author: 'Anonim Federation', isAnon: true, title: 'Semangat Perkuliahan!', message: 'Semoga perkuliahan semester ini lancar dan nilai seluruh mahasiswa Kelas F memuaskan!', date: '2026-10-25' }
+        ];
 
-        // AUTO COMPRESSOR UNTUK FOTO UPLOAD
+        // AUTO COMPRESSOR UNTUK FOTO UPLOAD MAHASISWA
         document.getElementById('photoInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -396,29 +545,49 @@
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
                         const MAX_SIZE = 120;
                         let width = img.width;
                         let height = img.height;
-
                         if (width > height) {
-                            if (width > MAX_SIZE) {
-                                height *= MAX_SIZE / width;
-                                width = MAX_SIZE;
-                            }
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
                         } else {
-                            if (height > MAX_SIZE) {
-                                width *= MAX_SIZE / height;
-                                height = MAX_SIZE;
-                            }
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
+                        canvas.width = width; canvas.height = height;
                         ctx.drawImage(img, 0, 0, width, height);
-
                         tempPhoto = canvas.toDataURL('image/jpeg', 0.6);
                         document.getElementById('photoPreview').src = tempPhoto;
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // AUTO COMPRESSOR UNTUK FOTO KENANGAN
+        document.getElementById('memoryPhotoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 400;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        tempMemoryPhoto = canvas.toDataURL('image/jpeg', 0.7);
+                        const preview = document.getElementById('memoryPhotoPreview');
+                        preview.src = tempMemoryPhoto;
+                        preview.classList.remove('hidden');
                     };
                     img.src = evt.target.result;
                 };
@@ -445,7 +614,8 @@
             const userStatusText = document.getElementById('userStatusText');
 
             if (user) {
-                userStatusText.innerText = `Login: ${user.displayName || user.email}`;
+                currentUserDisplayName = user.displayName || user.email.split('@')[0];
+                userStatusText.innerText = `Login: ${currentUserDisplayName}`;
                 authContainer.innerHTML = `<button id="btnLogoutTop" class="bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">Logout</button>`;
                 document.getElementById('btnLogoutTop').addEventListener('click', async () => { await signOut(auth); });
                 
@@ -463,6 +633,7 @@
                     btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
                 }
             } else {
+                currentUserDisplayName = "";
                 userStatusText.innerText = "Silakan login Google untuk akses penuh.";
                 authContainer.innerHTML = `<button id="btnLoginAgain" class="bg-white text-indigo-900 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-slate-100 flex items-center space-x-2"><i class="fa-brands fa-google text-red-500"></i><span>Login Google</span></button>`;
                 document.getElementById('btnLoginAgain').addEventListener('click', async () => {
@@ -484,9 +655,7 @@
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedStudents = defaultStudents;
-                    for (let s of defaultStudents) {
-                        await setDoc(doc(db, "students_v7_kelasF", s.id), s);
-                    }
+                    for (let s of defaultStudents) { await setDoc(doc(db, "students_v7_kelasF", s.id), s); }
                 }
 
                 const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
@@ -494,9 +663,7 @@
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedSchedule = defaultSchedule;
-                    for (let sch of defaultSchedule) {
-                        await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch);
-                    }
+                    for (let sch of defaultSchedule) { await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch); }
                 }
 
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
@@ -504,9 +671,21 @@
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
-                    for (let a of defaultAssignments) {
-                        await setDoc(doc(db, "assignments_v7_kelasF", a.id), a);
-                    }
+                }
+
+                const memSnap = await getDocs(collection(db, "memories_v7_kelasF"));
+                if (!memSnap.empty) {
+                    cachedMemories = memSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedMemories = defaultMemories;
+                }
+
+                const curhatSnap = await getDocs(collection(db, "curhat_v7_kelasF"));
+                if (!curhatSnap.empty) {
+                    cachedCurhats = curhatSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedCurhats = defaultCurhats;
+                    for (let c of defaultCurhats) { await setDoc(doc(db, "curhat_v7_kelasF", c.id), c); }
                 }
             } catch (err) {
                 console.error("Error loading cloud data:", err);
@@ -518,13 +697,16 @@
             renderStudents();
             renderSchedule();
             renderAttendance();
+            updateCourseFilterOptions();
+            renderCourseAttendance();
             renderAssignments();
+            renderMemories();
+            renderCurhats();
             checkDeadlineAlerts();
-            checkScheduleReminders();
             updateAbsentSummaryWidget();
+            checkScheduleReminder();
         }
 
-        // FUNGSI WIDGET REKAP KETIDAKHADIRAN HARI INI
         function updateAbsentSummaryWidget() {
             const absentList = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
             const container = document.getElementById('absentNamesContainer');
@@ -544,27 +726,34 @@
             }
         }
 
-        // FUNGSI PENGINGAT JADWAL HARI INI & BESOK
-        function checkScheduleReminders() {
+        function checkScheduleReminder() {
             const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const todayIndex = new Date().getDay();
             const tomorrowIndex = (todayIndex + 1) % 7;
 
             const todayName = daysMap[todayIndex];
             const tomorrowName = daysMap[tomorrowIndex];
-
+            
             document.getElementById('currentDayBadge').innerText = todayName;
             document.getElementById('tomorrowDayBadge').innerText = tomorrowName;
 
             const todaysClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
             const tomorrowsClasses = cachedSchedule.filter(s => s.day.toLowerCase() === tomorrowName.toLowerCase());
-
+            
+            const reminderText = document.getElementById('scheduleReminderText');
+            const reminderBanner = document.getElementById('scheduleReminderBanner');
+            
             const studentTodayText = document.getElementById('studentTabTodayText');
             const studentTomorrowText = document.getElementById('studentTabTomorrowText');
 
             if (todaysClasses.length > 0) {
+                reminderBanner.classList.remove('hidden');
+                let classDetails = todaysClasses.map(c => `<strong class="text-amber-950">${c.course}</strong> (${c.time} di ${c.room})`).join(', ');
+                reminderText.innerHTML = `Hari ini hari <strong>${todayName}</strong>. Jadwal perkuliahan: ${classDetails}. Persiapkan diri dan kelengkapan tugasmu!`;
+                
                 studentTodayText.innerHTML = todaysClasses.map(c => `• <strong>${c.course}</strong><br><span class="text-[11px] text-amber-200">${c.time} (${c.room})</span>`).join('<br>');
             } else {
+                reminderBanner.classList.add('hidden');
                 studentTodayText.innerHTML = `Tidak ada jadwal kuliah hari ini.`;
             }
 
@@ -621,24 +810,20 @@
             document.getElementById('scheduleModal').classList.remove('hidden');
         }
 
-        window.closeScheduleModal = function() {
-            document.getElementById('scheduleModal').classList.add('hidden');
-        }
+        window.closeScheduleModal = function() { document.getElementById('scheduleModal').classList.add('hidden'); }
 
         window.saveScheduleData = async function() {
             let day = document.getElementById('schedDay').value;
             let time = document.getElementById('schedTime').value;
             let course = document.getElementById('schedCourse').value;
             let room = document.getElementById('schedRoom').value;
-
             if (!course || !time) return alert("Mata kuliah dan jam wajib diisi!");
-
             let item = { id: Date.now().toString(), day, time, course, room: room || "Ruang Kuliah" };
             cachedSchedule.push(item);
             closeScheduleModal();
             renderSchedule();
-            checkScheduleReminders();
-
+            updateCourseFilterOptions();
+            checkScheduleReminder();
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
 
@@ -646,7 +831,8 @@
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
-                checkScheduleReminders();
+                updateCourseFilterOptions();
+                checkScheduleReminder();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -676,6 +862,50 @@
             `).join('');
         }
 
+        function updateCourseFilterOptions() {
+            const filterSelect = document.getElementById('courseFilterSelect');
+            const courses = Array.from(new Set(cachedSchedule.map(s => s.course)));
+            filterSelect.innerHTML = `<option value="Semua">Semua Mata Kuliah</option>` + 
+                courses.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        window.renderCourseAttendance = function() {
+            const tbody = document.getElementById('courseAttendanceTableBody');
+            const selectedCourse = document.getElementById('courseFilterSelect').value;
+            tbody.innerHTML = cachedStudents.map((s, idx) => {
+                const totalPertemuan = 16;
+                let hadir = totalPertemuan;
+                let izinSakit = 0;
+                let alpa = 0;
+                if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
+                    izinSakit = 1; hadir -= 1;
+                } else if (s.attendance === 'Alpa') {
+                    alpa = 1; hadir -= 1;
+                }
+                const percentage = Math.round((hadir / totalPertemuan) * 100);
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                            <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                            <span>${s.name}</span>
+                        </td>
+                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                        <td class="p-3 text-center text-xs font-semibold text-indigo-700">${selectedCourse}</td>
+                        <td class="p-3 text-center font-mono text-xs">${totalPertemuan}</td>
+                        <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
+                        <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
+                        <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                ${percentage}%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
         function getAttendanceClass(att) {
             switch(att) {
                 case 'Hadir': return 'bg-emerald-100 text-emerald-800';
@@ -692,6 +922,7 @@
                 s.attendance = val;
                 renderAttendance();
                 renderStudents();
+                renderCourseAttendance();
                 updateAbsentSummaryWidget();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
@@ -701,16 +932,14 @@
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
             renderStudents();
+            renderCourseAttendance();
             updateAbsentSummaryWidget();
-            for (let s of cachedStudents) {
-                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
-            }
+            for (let s of cachedStudents) { await setDoc(doc(db, "students_v7_kelasF", s.id), s); }
         }
 
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
-
             cachedAssignments.forEach(a => {
                 if (a.deadlineDate) {
                     const deadline = new Date(a.deadlineDate);
@@ -720,11 +949,9 @@
                     }
                 }
             });
-
             const alertContainer = document.getElementById('deadlineAlertContainer');
             const alertText = document.getElementById('deadlineAlertText');
             const badge = document.getElementById('assignmentBadge');
-
             if (urgentTasks.length > 0) {
                 alertContainer.classList.remove('hidden');
                 badge.classList.remove('hidden');
@@ -741,15 +968,12 @@
                 container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada tugas atau pengumuman.</p>`;
                 return;
             }
-
             const today = new Date();
-
             container.innerHTML = cachedAssignments.map(a => {
                 let badgeHTML = "";
                 if (a.deadlineDate) {
                     const deadline = new Date(a.deadlineDate);
                     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-                    
                     if (diffDays < 0) {
                         badgeHTML = `<span class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">Lewat Deadline</span>`;
                     } else if (diffDays <= 3) {
@@ -758,7 +982,6 @@
                         badgeHTML = `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">${diffDays} Hari Lagi</span>`;
                     }
                 }
-
                 return `
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative">
                         <div class="flex items-center justify-between">
@@ -776,6 +999,159 @@
             }).join('');
         }
 
+        function renderMemories() {
+            let container = document.getElementById('memoriesGrid');
+            if (cachedMemories.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada foto kenangan yang diunggah.</p>`;
+                return;
+            }
+            container.innerHTML = cachedMemories.map(m => `
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <img src="${m.photo || defaultAvatarPhoto}" class="w-full h-40 object-cover">
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">${m.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1">${m.desc}</p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t flex justify-end">
+                            <button onclick="window.deleteMemory('${m.id}')" class="text-rose-600 text-xs font-semibold hover:underline">
+                                <i class="fa-solid fa-trash mr-1"></i>Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderCurhats() {
+            let container = document.getElementById('curhatGrid');
+            if (cachedCurhats.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada curhatan. Jadilah yang pertama menyampaikan ucapan atau keluh kesah!</p>`;
+                return;
+            }
+            container.innerHTML = cachedCurhats.map(c => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-rose-100 to-transparent rounded-bl-full pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${c.isAnon ? 'bg-slate-800 text-slate-200' : 'bg-rose-100 text-rose-700'}">
+                                ${c.isAnon ? '🕶️ Anonim' : '👤 ' + c.author}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">${c.date || ''}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">${c.title}</h4>
+                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${c.message}</p>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="mt-4 pt-2 border-t border-slate-100 flex justify-end">
+                            <button onclick="window.deleteCurhat('${c.id}')" class="text-rose-600 text-xs font-semibold hover:underline">
+                                <i class="fa-solid fa-trash mr-1"></i>Hapus
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.toggleCurhatAuthorInput = function() {
+            const mode = document.getElementById('curhatMode').value;
+            const authorBox = document.getElementById('curhatAuthorBox');
+            if (mode === 'Public') {
+                authorBox.classList.remove('hidden');
+                if (currentUserDisplayName && !document.getElementById('curhatAuthorName').value) {
+                    document.getElementById('curhatAuthorName').value = currentUserDisplayName;
+                }
+            } else {
+                authorBox.classList.add('hidden');
+            }
+        }
+
+        window.openAddCurhatModal = function() {
+            document.getElementById('curhatMode').value = "Anonymous";
+            document.getElementById('curhatAuthorName').value = currentUserDisplayName || "";
+            document.getElementById('curhatTitle').value = "";
+            document.getElementById('curhatMessage').value = "";
+            toggleCurhatAuthorInput();
+            document.getElementById('curhatModal').classList.remove('hidden');
+        }
+
+        window.closeCurhatModal = function() { document.getElementById('curhatModal').classList.add('hidden'); }
+
+        window.saveCurhatData = async function() {
+            const mode = document.getElementById('curhatMode').value;
+            const title = document.getElementById('curhatTitle').value;
+            const message = document.getElementById('curhatMessage').value;
+            let authorName = document.getElementById('curhatAuthorName').value;
+
+            if (!title || !message) return alert("Judul dan isi curhatan wajib diisi!");
+
+            const isAnon = mode === 'Anonymous';
+            if (!isAnon && !authorName) {
+                authorName = currentUserDisplayName || "Mahasiswa Kelas F";
+            }
+
+            const item = {
+                id: Date.now().toString(),
+                author: isAnon ? "Anonim Federation" : authorName,
+                isAnon,
+                title,
+                message,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            cachedCurhats.unshift(item);
+            closeCurhatModal();
+            renderCurhats();
+
+            await setDoc(doc(db, "curhat_v7_kelasF", item.id), item);
+        }
+
+        window.deleteCurhat = async function(id) {
+            if (confirm("Hapus curhatan ini?")) {
+                cachedCurhats = cachedCurhats.filter(c => c.id !== id);
+                renderCurhats();
+                await deleteDoc(doc(db, "curhat_v7_kelasF", id));
+            }
+        }
+
+        window.openAddMemoryModal = function() {
+            document.getElementById('memoryTitle').value = "";
+            document.getElementById('memoryDesc').value = "";
+            document.getElementById('memoryPhotoInput').value = "";
+            document.getElementById('memoryPhotoPreview').classList.add('hidden');
+            tempMemoryPhoto = "";
+            document.getElementById('memoryModal').classList.remove('hidden');
+        }
+
+        window.closeMemoryModal = function() { document.getElementById('memoryModal').classList.add('hidden'); }
+
+        window.saveMemoryData = async function() {
+            let title = document.getElementById('memoryTitle').value;
+            let desc = document.getElementById('memoryDesc').value;
+            if (!title) return alert("Judul kenangan wajib diisi!");
+
+            let item = {
+                id: Date.now().toString(),
+                title,
+                desc: desc || "Kebersamaan Kelas F",
+                photo: tempMemoryPhoto || defaultAvatarPhoto
+            };
+
+            cachedMemories.push(item);
+            closeMemoryModal();
+            renderMemories();
+
+            await setDoc(doc(db, "memories_v7_kelasF", item.id), item);
+        }
+
+        window.deleteMemory = async function(id) {
+            if (confirm("Hapus foto kenangan ini?")) {
+                cachedMemories = cachedMemories.filter(m => m.id !== id);
+                renderMemories();
+                await deleteDoc(doc(db, "memories_v7_kelasF", id));
+            }
+        }
+
         window.openAddAssignmentModal = function() {
             document.getElementById('assignCourse').value = "";
             document.getElementById('assignTitle').value = "";
@@ -784,29 +1160,19 @@
             document.getElementById('assignmentModal').classList.remove('hidden');
         }
 
-        window.closeAssignmentModal = function() {
-            document.getElementById('assignmentModal').classList.add('hidden');
-        }
+        window.closeAssignmentModal = function() { document.getElementById('assignmentModal').classList.add('hidden'); }
 
         window.saveAssignmentData = async function() {
             let course = document.getElementById('assignCourse').value;
             let title = document.getElementById('assignTitle').value;
             let deadlineDate = document.getElementById('assignDeadlineDate').value;
             let desc = document.getElementById('assignDesc').value;
-
             if (!title) return alert("Judul wajib diisi!");
-
-            let item = {
-                id: Date.now().toString(),
-                course: course || "Pengumuman Kelas",
-                title, deadlineDate: deadlineDate || "", desc
-            };
-
+            let item = { id: Date.now().toString(), course: course || "Pengumuman Kelas", title, deadlineDate: deadlineDate || "", desc };
             cachedAssignments.push(item);
             closeAssignmentModal();
             renderAssignments();
             checkDeadlineAlerts();
-
             await setDoc(doc(db, "assignments_v7_kelasF", item.id), item);
         }
 
@@ -825,7 +1191,6 @@
                 el.classList.remove('border-indigo-600', 'text-indigo-600');
                 el.classList.add('border-transparent', 'text-slate-500');
             });
-
             document.getElementById(`tabContent-${tabKey}`).classList.remove('hidden');
             const activeBtn = document.getElementById(`tabBtn-${tabKey}`);
             activeBtn.classList.remove('border-transparent', 'text-slate-500');
@@ -854,38 +1219,27 @@
             document.getElementById('studentModal').classList.remove('hidden');
         }
 
-        window.closeModal = function() {
-            document.getElementById('studentModal').classList.add('hidden');
-        }
+        window.closeModal = function() { document.getElementById('studentModal').classList.add('hidden'); }
 
         window.saveStudentData = async function() {
             let id = document.getElementById('editId').value;
-            let name = document.getElementById('editName' ).value;
+            let name = document.getElementById('editName').value;
             let nim = document.getElementById('editNim').value;
             let role = document.getElementById('editRole').value;
-
             if (!name) return alert("Nama wajib diisi!");
-
             let s = null;
             if (id) {
                 s = cachedStudents.find(x => x.id === id);
-                if (s) {
-                    s.name = name; s.nim = nim; s.role = role;
-                    if (tempPhoto) s.photo = tempPhoto;
-                }
+                if (s) { s.name = name; s.nim = nim; s.role = role; if (tempPhoto) s.photo = tempPhoto; }
             } else {
-                s = {
-                    id: Date.now().toString(),
-                    name, nim, role, attendance: 'Hadir',
-                    photo: tempPhoto || defaultAvatarPhoto
-                };
+                s = { id: Date.now().toString(), name, nim, role, attendance: 'Hadir', photo: tempPhoto || defaultAvatarPhoto };
                 cachedStudents.push(s);
             }
             closeModal();
             renderStudents();
             renderAttendance();
+            renderCourseAttendance();
             updateAbsentSummaryWidget();
-
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
     </script>
