@@ -71,7 +71,7 @@
             </button>
         </div>
 
-        <!-- TAB 1: DIREKTORI MAHASISWA (DENGAN REKAP HARIAN & PENGINGAT) -->
+        <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
             <!-- PENGINGAT KULIAH HARI INI -->
             <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
@@ -211,7 +211,7 @@
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Pengumuman & Tugas Kelas F</h2>
-                    <p class="text-xs text-slate-500">Informasi instruksi perkuliahan dan deadline tugas.</p>
+                    <p class="text-xs text-slate-500">Informasi instruksi perkuliahan dan deadline tugas (Otomatis terhapus > 1 hari dari deadline).</p>
                 </div>
                 <button id="btnAddAssignment" onclick="openAddAssignmentModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
                     <i class="fa-solid fa-plus"></i><span>Buat Pengumuman/Tugas</span>
@@ -365,7 +365,8 @@
 
         const adminEmails = [
             "jubilantelioneyp@gmail.com",
-            "andimuhammadfaridirsal@gmail.com"
+            "andimuhammadfaridirsal@gmail.com",
+            "nurazizatunnafsia01@gmail.com"
         ];
 
         let cachedStudents = [];
@@ -421,9 +422,8 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto }
         ];
 
-        const defaultAssignments = [
-            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
-        ];
+        // TUGAS LSTS DIHILANGKAN DARI SINI
+        const defaultAssignments = [];
 
         const defaultSchedule = [
             { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
@@ -556,7 +556,42 @@
             } catch (err) {
                 console.error("Error loading cloud data:", err);
             }
+            
+            // Jalankan fungsi pengecekan otomatis untuk menghapus tugas yang sudah lewat > 1 hari dari deadline
+            await cleanExpiredAssignments();
             renderAll();
+        }
+
+        // FUNGSI OTOMATIS HAPUS TUGAS JIKA LEWAT > 1 HARI DARI DEADLINE
+        async function cleanExpiredAssignments() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            let remainingAssignments = [];
+            for (let a of cachedAssignments) {
+                if (a.deadlineDate) {
+                    const deadline = new Date(a.deadlineDate);
+                    deadline.setHours(0, 0, 0, 0);
+
+                    // Selisih hari (hari ini - deadline)
+                    const diffTime = today - deadline;
+                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Jika sudah lewat lebih dari 1 hari (> 1), hapus dari database dan jangan masukkan ke cache
+                    if (diffDays > 1) {
+                        try {
+                            await deleteDoc(doc(db, "assignments_v7_kelasF", a.id));
+                        } catch (e) {
+                            console.error("Gagal menghapus tugas kedaluwarsa:", e);
+                        }
+                    } else {
+                        remainingAssignments.push(a);
+                    }
+                } else {
+                    remainingAssignments.push(a);
+                }
+            }
+            cachedAssignments = remainingAssignments;
         }
 
         function renderAll() {
@@ -843,12 +878,17 @@
         // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
             let urgentTasks = [];
 
             cachedAssignments.forEach(a => {
                 if (a.deadlineDate) {
                     const deadline = new Date(a.deadlineDate);
-                    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    deadline.setHours(0, 0, 0, 0);
+
+                    const diffTime = deadline - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
                     if (diffDays >= 0 && diffDays <= 3) {
                         urgentTasks.push(`${a.title} (${diffDays === 0 ? 'Hari ini!' : diffDays + ' hari lagi'})`);
                     }
@@ -877,11 +917,14 @@
             }
 
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             container.innerHTML = cachedAssignments.map(a => {
                 let badgeHTML = "";
                 if (a.deadlineDate) {
                     const deadline = new Date(a.deadlineDate);
+                    deadline.setHours(0, 0, 0, 0);
+
                     const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
                     
                     if (diffDays < 0) {
