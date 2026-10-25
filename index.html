@@ -60,6 +60,10 @@
                 <i class="fa-solid fa-clipboard-user"></i>
                 <span>Absensi Kelas</span>
             </button>
+            <button onclick="switchTab('absenceRecap')" id="tabBtn-absenceRecap" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Rekap Ketidakhadiran</span>
+            </button>
             <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Pengumuman & Tugas</span>
@@ -69,29 +73,6 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
-            <!-- PENGINGAT KULIAH HARI INI DI DIREKTORI -->
-            <div id="todayScheduleAlert" class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
-                <div class="flex items-start space-x-3">
-                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
-                    <div class="w-full">
-                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitle">Pengingat Jadwal Kuliah Hari Ini</h4>
-                        <div id="todayScheduleList" class="text-xs space-y-1 text-indigo-800">
-                            <!-- Rendered dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- KOTAK RINGKASAN KETIDAKHADIRAN -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
-                <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center">
-                    <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> Rekap Ketidakhadiran Hari Ini
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs" id="absenceSummaryBox">
-                    <!-- Rendered dynamically -->
-                </div>
-            </div>
-
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
@@ -108,19 +89,6 @@
 
         <!-- TAB 2: JADWAL KULIAH -->
         <section id="tabContent-schedule" class="tab-content hidden">
-            <!-- PENGINGAT KULIAH HARI INI DI TAB JADWAL -->
-            <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
-                <div class="flex items-start space-x-3">
-                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
-                    <div class="w-full">
-                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitleSchedule">Pengingat Jadwal Kuliah Hari Ini</h4>
-                        <div id="todayScheduleListSchedule" class="text-xs space-y-1 text-indigo-800">
-                            <!-- Rendered dynamically -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -169,7 +137,44 @@
             </div>
         </section>
 
-        <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 4: REKAP KETIDAKHADIRAN BERDASARKAN MATA KULIAH -->
+        <section id="tabContent-absenceRecap" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Rekap Akumulasi Ketidakhadiran per Mata Kuliah</h2>
+                        <p class="text-xs text-slate-500">Pilih mata kuliah untuk melihat total frekuensi Izin, Sakit, atau Alpa setiap mahasiswa.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold mb-1 text-slate-600">Pilih Mata Kuliah:</label>
+                        <select id="filterCourseSelect" onchange="renderAbsenceRecap()" class="text-sm border border-slate-300 rounded-lg px-3 py-2 bg-slate-50 font-semibold text-indigo-900 focus:ring-2 focus:ring-indigo-500">
+                            <!-- Rendered dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-xs border-b">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Nama Mahasiswa</th>
+                                <th class="p-3">NIM</th>
+                                <th class="p-3 text-center">Total Izin</th>
+                                <th class="p-3 text-center">Total Sakit</th>
+                                <th class="p-3 text-center">Total Alpa</th>
+                                <th class="p-3 text-center">Aksi (Catat Sesi)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="absenceRecapTableBody" class="divide-y divide-slate-100">
+                            <!-- Rendered dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
             <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
@@ -228,6 +233,27 @@
             <div class="flex justify-end space-x-2 pt-4">
                 <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
                 <button type="button" onclick="saveStudentData()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CATAT KETIDAKHADIRAN SESI -->
+    <div id="sessionAbsenceModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-base text-indigo-900">Catat Ketidakhadiran Sesi</h3>
+            <p id="sessionModalStudentName" class="text-xs text-slate-600 font-semibold"></p>
+            <input type="hidden" id="modalStudentId">
+            <div>
+                <label class="block text-xs font-semibold mb-1">Status Ketidakhadiran Sesi Ini</label>
+                <select id="modalAbsenceStatus" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold">
+                    <option value="Izin">Izin</option>
+                    <option value="Sakit">Sakit</option>
+                    <option value="Alpa">Alpa</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeSessionModal()" class="px-3 py-1.5 border rounded-lg text-xs">Batal</button>
+                <button type="button" onclick="saveSessionAbsence()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-semibold">Tambah Catatan</button>
             </div>
         </div>
     </div>
@@ -329,50 +355,52 @@
 
         // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
         const defaultStudents = [
-            { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "3", nim: "260901500060", name: "ANGGITA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "4", nim: "260901500061", name: "YUNANDA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "5", nim: "260901500062", name: "NUR ANISA FITRI", role: "Wakil Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "6", nim: "260901500063", name: "AULIA ASWANI ASWAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "7", nim: "260901500064", name: "NUR ANNISA AZ ZAHRA RUSDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "8", nim: "260901500065", name: "JELITA CAHYADI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "9", nim: "260901500066", name: "MIFTAH AZIRAH QIRAINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "10", nim: "260901500067", name: "ASMIRANDA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "11", nim: "260901500068", name: "RIANY PRATIWI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "12", nim: "260901500069", name: "NURUL FAUSIAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "13", nim: "260901500070", name: "NASTHAIN S. BUNTA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "14", nim: "260901501068", name: "JUBILANT ELIONEY PABALIK", role: "Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "15", nim: "260901501069", name: "MUHAMMAD KHAIRIL ANWAR", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "16", nim: "260901501070", name: "ANDI MUH. FARID IRSAL", role: "Sekretaris", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "17", nim: "260901501071", name: "ROSALINA RINDING PADANG", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "18", nim: "260901501072", name: "NAFISAH AARIFAH ARIFUDDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "19", nim: "260901501074", name: "KEISHA SALSABILA MURSIDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "20", nim: "260901501075", name: "SYIFA NAFISAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "21", nim: "260901501076", name: "REZKY AMALYA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "22", nim: "260901501078", name: "NATALIA KRISSANTI NASIT SADIPUN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "23", nim: "260901501079", name: "NURHAFHIZAH HAMKA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "24", nim: "260901501080", name: "AMBAR WULANDARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "25", nim: "260901501081", name: "NUR AZIZA TUNNAFSIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "26", nim: "260901501082", name: "AL GIBRAN RAMADHAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "27", nim: "260901501083", name: "NUR FITRAH SALEH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "28", nim: "260901501087", name: "AMANDA NUR HASANAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "29", nim: "260901502060", name: "NABILA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "30", nim: "260901502061", name: "ARISKA DWI AULIA J", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "31", nim: "260901502062", name: "NAJLA MUTHIAH ASDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "32", nim: "260901502063", name: "NADYA AFIFAH PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "33", nim: "260901502064", name: "NATASYA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "34", nim: "260901502065", name: "EDITA NABILA AUDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "35", nim: "260901502066", name: "ANDI AULIA AZZAHRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "36", nim: "260901502067", name: "DAVINA ZAKIYAH PUTRI YUSLINRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "37", nim: "260901502068", name: "NADIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "38", nim: "260901502069", name: "LILIS KARLINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "39", nim: "260901502070", name: "ARDIANSYAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "40", nim: "260901502072", name: "MEI LUNA INDA SARI S", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
-            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
+            { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "3", nim: "260901500060", name: "ANGGITA PUTRI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "4", nim: "260901500061", name: "YUNANDA PUTRI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "5", nim: "260901500062", name: "NUR ANISA FITRI", role: "Wakil Keti", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "6", nim: "260901500063", name: "AULIA ASWANI ASWAN", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "7", nim: "260901500064", name: "NUR ANNISA AZ ZAHRA RUSDI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "8", nim: "260901500065", name: "JELITA CAHYADI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "9", nim: "260901500066", name: "MIFTAH AZIRAH QIRAINA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "10", nim: "260901500067", name: "ASMIRANDA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "11", nim: "260901500068", name: "RIANY PRATIWI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "12", nim: "260901500069", name: "NURUL FAUSIAH", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "13", nim: "260901500070", name: "NASTHAIN S. BUNTA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "14", nim: "260901501068", name: "JUBILANT ELIONEY PABALIK", role: "Keti", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "15", nim: "260901501069", name: "MUHAMMAD KHAIRIL ANWAR", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "16", nim: "260901501070", name: "ANDI MUH. FARID IRSAL", role: "Sekretaris", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "17", nim: "260901501071", name: "ROSALINA RINDING PADANG", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "18", nim: "260901501072", name: "NAFISAH AARIFAH ARIFUDDIN", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "19", nim: "260901501074", name: "KEISHA SALSABILA MURSIDIN", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "20", nim: "260901501075", name: "SYIFA NAFISAH", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "21", nim: "260901501076", name: "REZKY AMALYA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "22", nim: "260901501078", name: "NATALIA KRISSANTI NASIT SADIPUN", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "23", nim: "260901501079", name: "NURHAFHIZAH HAMKA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "24", nim: "260901501080", name: "AMBAR WULANDARI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "25", nim: "260901501081", name: "NUR AZIZA TUNNAFSIA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "26", nim: "260901501082", name: "AL GIBRAN RAMADHAN", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "27", nim: "260901501083", name: "NUR FITRAH SALEH", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "28", nim: "260901501087", name: "AMANDA NUR HASANAH", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "29", nim: "260901502060", name: "NABILA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "30", nim: "260901502061", name: "ARISKA DWI AULIA J", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "31", nim: "260901502062", name: "NAJLA MUTHIAH ASDI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "32", nim: "260901502063", name: "NADYA AFIFAH PUTRI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "33", nim: "260901502064", name: "NATASYA PUTRI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "34", nim: "260901502065", name: "EDITA NABILA AUDI", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "35", nim: "260901502066", name: "ANDI AULIA AZZAHRA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "36", nim: "260901502067", name: "DAVINA ZAKIYAH PUTRI YUSLINRA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "37", nim: "260901502068", name: "NADIA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "38", nim: "260901502069", name: "LILIS KARLINA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "39", nim: "260901502070", name: "ARDIANSYAH", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "40", nim: "260901502072", name: "MEI LUNA INDA SARI S", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto },
+            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", absenceRecords: {}, photo: defaultAvatarPhoto }
         ];
 
-        const defaultAssignments = [];
+        const defaultAssignments = [
+            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
+        ];
 
         const defaultSchedule = [
             { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
@@ -510,78 +538,12 @@
 
         function renderAll() {
             renderStudents();
-            renderAbsenceSummary();
             renderSchedule();
-            checkTodayScheduleReminder();
             renderAttendance();
+            populateCourseDropdown();
+            renderAbsenceRecap();
             renderAssignments();
             checkDeadlineAlerts();
-        }
-
-        // PENGINGAT KULIAH HARI INI
-        function checkTodayScheduleReminder() {
-            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const todayName = daysMap[new Date().getDay()];
-
-            const todayClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
-            
-            // Render ke Direktori Mahasiswa & Jadwal Kuliah
-            ['todayScheduleList', 'todayScheduleListSchedule'].forEach(id => {
-                const listContainer = document.getElementById(id);
-                if (listContainer) {
-                    if (todayClasses.length > 0) {
-                        listContainer.innerHTML = todayClasses.map(c => `
-                            <div class="flex items-center justify-between bg-white/80 p-2 rounded border border-indigo-100 my-1">
-                                <span><strong>${c.course}</strong> (${c.time})</span>
-                                <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        listContainer.innerHTML = `<p class="italic text-indigo-700">Tidak ada jadwal kuliah terjadwal untuk hari ini (${todayName}). Selamat beristirahat!</p>`;
-                    }
-                }
-            });
-
-            ['todayAlertTitle', 'todayAlertTitleSchedule'].forEach(id => {
-                const titleEl = document.getElementById(id);
-                if (titleEl) {
-                    titleEl.innerText = `📅 Pengingat Kuliah Hari Ini (${todayName}):`;
-                }
-            });
-        }
-
-        // RINGKASAN & NAMA KETIDAKHADIRAN
-        function renderAbsenceSummary() {
-            const container = document.getElementById('absenceSummaryBox');
-            if (!container) return;
-
-            const izinList = cachedStudents.filter(s => s.attendance === 'Izin');
-            const sakitList = cachedStudents.filter(s => s.attendance === 'Sakit');
-            const alpaList = cachedStudents.filter(s => s.attendance === 'Alpa');
-
-            container.innerHTML = `
-                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
-                    <div class="font-bold text-amber-900 mb-1 flex justify-between items-center">
-                        <span>Izin</span>
-                        <span class="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full text-[11px]">${izinList.length} Orang</span>
-                    </div>
-                    <p class="text-slate-600 text-[11px]">${izinList.length > 0 ? izinList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
-                </div>
-                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg">
-                    <div class="font-bold text-blue-900 mb-1 flex justify-between items-center">
-                        <span>Sakit</span>
-                        <span class="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full text-[11px]">${sakitList.length} Orang</span>
-                    </div>
-                    <p class="text-slate-600 text-[11px]">${sakitList.length > 0 ? sakitList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
-                </div>
-                <div class="bg-rose-50 border border-rose-200 p-3 rounded-lg">
-                    <div class="font-bold text-rose-900 mb-1 flex justify-between items-center">
-                        <span>Alpa</span>
-                        <span class="bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full text-[11px]">${alpaList.length} Orang</span>
-                    </div>
-                    <p class="text-slate-600 text-[11px]">${alpaList.length > 0 ? alpaList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
-                </div>
-            `;
         }
 
         function renderStudents() {
@@ -640,7 +602,7 @@
             cachedSchedule.push(item);
             closeScheduleModal();
             renderSchedule();
-            checkTodayScheduleReminder();
+            populateCourseDropdown();
 
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
@@ -649,7 +611,7 @@
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
-                checkTodayScheduleReminder();
+                populateCourseDropdown();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -679,6 +641,94 @@
             `).join('');
         }
 
+        // POPULASI DROPDOWN MATA KULIAH UNTUK REKAP
+        function populateCourseDropdown() {
+            const selectEl = document.getElementById('filterCourseSelect');
+            if (!selectEl) return;
+
+            const courses = [...new Set(cachedSchedule.map(s => s.course))];
+            if (courses.length === 0) {
+                selectEl.innerHTML = `<option value="">Belum ada mata kuliah</option>`;
+                return;
+            }
+
+            const currentVal = selectEl.value;
+            selectEl.innerHTML = courses.map(c => `<option value="${c}">${c}</option>`).join('');
+            if (courses.includes(currentVal)) {
+                selectEl.value = currentVal;
+            }
+        }
+
+        // RENDER REKAP KETIDAKHADIRAN PER MATAKULIAH
+        window.renderAbsenceRecap = function() {
+            const selectEl = document.getElementById('filterCourseSelect');
+            const tbody = document.getElementById('absenceRecapTableBody');
+            if (!selectEl || !tbody) return;
+
+            const selectedCourse = selectEl.value;
+            if (!selectedCourse) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 text-xs italic">Pilih mata kuliah terlebih dahulu.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = cachedStudents.map((s, idx) => {
+                const records = s.absenceRecords || {};
+                const courseRecord = records[selectedCourse] || { izin: 0, sakit: 0, alpa: 0 };
+
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800">${s.name}</td>
+                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 text-xs font-bold bg-amber-100 text-amber-800 rounded">${courseRecord.izin || 0}x</span></td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 text-xs font-bold bg-blue-100 text-blue-800 rounded">${courseRecord.sakit || 0}x</span></td>
+                        <td class="p-3 text-center"><span class="px-2 py-0.5 text-xs font-bold bg-rose-100 text-rose-800 rounded">${courseRecord.alpa || 0}x</span></td>
+                        <td class="p-3 text-center">
+                            ${isAdmin ? `
+                                <button onclick="window.openSessionModal('${s.id}', '${selectedCourse}')" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2.5 py-1 rounded text-xs font-semibold">
+                                    <i class="fa-solid fa-plus mr-1"></i> Catat Sesi
+                                </button>
+                            ` : `<span class="text-xs text-slate-400 italic">Hanya Keti</span>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.openSessionModal = function(studentId, courseName) {
+            const s = cachedStudents.find(x => x.id === studentId);
+            if (!s) return;
+            document.getElementById('modalStudentId').value = studentId;
+            document.getElementById('sessionModalStudentName').innerText = `${s.name} (${courseName})`;
+            document.getElementById('modalAbsenceStatus').value = 'Izin';
+            document.getElementById('sessionAbsenceModal').classList.remove('hidden');
+        }
+
+        window.closeSessionModal = function() {
+            document.getElementById('sessionAbsenceModal').classList.add('hidden');
+        }
+
+        window.saveSessionAbsence = async function() {
+            const studentId = document.getElementById('modalStudentId').value;
+            const status = document.getElementById('modalAbsenceStatus').value;
+            const selectEl = document.getElementById('filterCourseSelect');
+            const courseName = selectEl.value;
+
+            const s = cachedStudents.find(x => x.id === studentId);
+            if (s && courseName) {
+                if (!s.absenceRecords) s.absenceRecords = {};
+                if (!s.absenceRecords[courseName]) s.absenceRecords[courseName] = { izin: 0, sakit: 0, alpa: 0 };
+
+                if (status === 'Izin') s.absenceRecords[courseName].izin = (s.absenceRecords[courseName].izin || 0) + 1;
+                if (status === 'Sakit') s.absenceRecords[courseName].sakit = (s.absenceRecords[courseName].sakit || 0) + 1;
+                if (status === 'Alpa') s.absenceRecords[courseName].alpa = (s.absenceRecords[courseName].alpa || 0) + 1;
+
+                closeSessionModal();
+                renderAbsenceRecap();
+                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
+            }
+        }
+
         function getAttendanceClass(att) {
             switch(att) {
                 case 'Hadir': return 'bg-emerald-100 text-emerald-800';
@@ -694,7 +744,6 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                renderAbsenceSummary();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -702,12 +751,12 @@
         window.setBulkAttendance = async function(val) {
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
-            renderAbsenceSummary();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
+        // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
@@ -877,7 +926,7 @@
             } else {
                 s = {
                     id: Date.now().toString(),
-                    name, nim, role, attendance: 'Hadir',
+                    name, nim, role, attendance: 'Hadir', absenceRecords: {},
                     photo: tempPhoto || defaultAvatarPhoto
                 };
                 cachedStudents.push(s);
@@ -885,7 +934,7 @@
             closeModal();
             renderStudents();
             renderAttendance();
-            renderAbsenceSummary();
+            renderAbsenceRecap();
 
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
