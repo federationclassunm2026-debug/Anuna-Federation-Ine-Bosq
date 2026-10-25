@@ -234,14 +234,15 @@
             </div>
         </section>
 
-        <!-- TAB 6 BARU: KENANGAN FEDERATION -->
+        <!-- TAB 6: KENANGAN FEDERATION (TERBUKA UNTUK SEMUA MAHASISWA) -->
         <section id="tabContent-memories" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Kenangan Federation S1 Akuntansi F</h2>
                     <p class="text-xs text-slate-500">Dokumentasi momen kebersamaan, kegiatan kampus, dan galeri kelas.</p>
                 </div>
-                <button id="btnAddMemory" onclick="openAddMemoryModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
+                <!-- Tombol unggah kini aktif untuk semua mahasiswa -->
+                <button onclick="openAddMemoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
                     <i class="fa-solid fa-camera"></i><span>Unggah Kenangan</span>
                 </button>
             </div>
@@ -543,7 +544,6 @@
             const btnAddStudent = document.getElementById('btnAddStudent');
             const btnAddAssignment = document.getElementById('btnAddAssignment');
             const btnAddSchedule = document.getElementById('btnAddSchedule');
-            const btnAddMemory = document.getElementById('btnAddMemory');
             const adminAttendanceActions = document.getElementById('adminAttendanceActions');
             const userStatusText = document.getElementById('userStatusText');
 
@@ -558,14 +558,12 @@
                     btnAddStudent.classList.remove('hidden'); btnAddStudent.classList.add('flex');
                     btnAddAssignment.classList.remove('hidden'); btnAddAssignment.classList.add('flex');
                     btnAddSchedule.classList.remove('hidden'); btnAddSchedule.classList.add('flex');
-                    btnAddMemory.classList.remove('hidden'); btnAddMemory.classList.add('flex');
                     adminAttendanceActions.classList.remove('hidden'); adminAttendanceActions.classList.add('flex');
                 } else {
                     isAdmin = false;
                     adminBanner.classList.add('hidden');
                     btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
-                    btnAddSchedule.classList.add('hidden'); btnAddMemory.classList.add('hidden');
-                    adminAttendanceActions.classList.add('hidden');
+                    btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
                 }
             } else {
                 userStatusText.innerText = "Silakan login Google untuk akses penuh.";
@@ -577,8 +575,7 @@
                 isAdmin = false;
                 adminBanner.classList.add('hidden');
                 btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
-                btnAddSchedule.classList.add('hidden'); btnAddMemory.classList.add('hidden');
-                adminAttendanceActions.classList.add('hidden');
+                btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
             }
             loadCloudData();
         });
@@ -907,7 +904,7 @@
             }).join('');
         }
 
-        // FUNGSI RENDER KENANGAN
+        // FUNGSI RENDER KENANGAN (Tombol hapus kini tersedia untuk semua mahasiswa)
         function renderMemories() {
             let container = document.getElementById('memoriesGrid');
             if (cachedMemories.length === 0) {
@@ -922,7 +919,11 @@
                             <h4 class="font-bold text-slate-800 text-sm">${m.title}</h4>
                             <p class="text-xs text-slate-500 mt-1">${m.desc}</p>
                         </div>
-                        ${isAdmin ? `<div class="mt-4 pt-2 border-t flex justify-end"><button onclick="window.deleteMemory('${m.id}')" class="text-rose-600 text-xs font-semibold hover:underline"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></div>` : ''}
+                        <div class="mt-4 pt-2 border-t flex justify-end">
+                            <button onclick="window.deleteMemory('${m.id}')" class="text-rose-600 text-xs font-semibold hover:underline">
+                                <i class="fa-solid fa-trash mr-1"></i>Hapus
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
