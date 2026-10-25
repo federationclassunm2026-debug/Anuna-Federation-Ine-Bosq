@@ -64,14 +64,14 @@
                 <i class="fa-solid fa-chart-pie"></i>
                 <span>Rekap Per Matkul</span>
             </button>
-            <button onclick="switchTab('memories')" id="tabBtn-memories" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
-                <i class="fa-solid fa-images"></i>
-                <span>Kenangan Federation</span>
-            </button>
             <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Pengumuman & Tugas</span>
                 <span id="assignmentBadge" class="hidden bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold ml-1">!</span>
+            </button>
+            <button onclick="switchTab('memories')" id="tabBtn-memories" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-images text-amber-500"></i>
+                <span>Kenangan Federation</span>
             </button>
         </div>
 
@@ -209,23 +209,7 @@
             </div>
         </section>
 
-        <!-- TAB: KENANGAN FEDERATION (TERBUKA UNTUK SEMUA MAHASISWA) -->
-        <section id="tabContent-memories" class="tab-content hidden">
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-800"><i class="fa-solid fa-images text-indigo-600 mr-2"></i> Kenangan Federation</h2>
-                    <p class="text-xs text-slate-500">Kumpulan dokumentasi, foto kebersamaan, dan momen berharga S1 Akuntansi Kelas F 2026.</p>
-                </div>
-                <button onclick="openAddMemoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
-                    <i class="fa-solid fa-upload"></i><span>Tambah Kenangan Foto</span>
-                </button>
-            </div>
-            <div id="memoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Rendered dynamically -->
-            </div>
-        </section>
-
-        <!-- TAB: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
             <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
@@ -246,6 +230,22 @@
                 </button>
             </div>
             <div id="assignmentsList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 6 BARU: KENANGAN FEDERATION -->
+        <section id="tabContent-memories" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Kenangan Federation S1 Akuntansi F</h2>
+                    <p class="text-xs text-slate-500">Dokumentasi momen kebersamaan, kegiatan kampus, dan galeri kelas.</p>
+                </div>
+                <button id="btnAddMemory" onclick="openAddMemoryModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
+                    <i class="fa-solid fa-camera"></i><span>Unggah Kenangan</span>
+                </button>
+            </div>
+            <div id="memoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <!-- Rendered dynamically -->
             </div>
         </section>
@@ -322,12 +322,740 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH KENANGAN / FOTO (TERBUKA UNTUK SEMUA MAHASISWA) -->
+    <!-- MODAL BUAT TUGAS / PENGUMUMAN -->
+    <div id="assignmentModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-lg">Tambah Pengumuman / Tugas</h3>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Mata Kuliah / Kategori</label>
+                <input type="text" id="assignCourse" placeholder="Contoh: Akuntansi Keuangan II" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Judul Tugas / Informasi</label>
+                <input type="text" id="assignTitle" placeholder="Contoh: Laporan Keuangan Bab 3" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Tenggat Waktu / Deadline</label>
+                <input type="date" id="assignDeadlineDate" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Deskripsi Tambahan</label>
+                <textarea id="assignDesc" rows="3" placeholder="Instruksi pengerjaan..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeAssignmentModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveAssignmentData()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Publikasikan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL UNGGAH KENANGAN -->
     <div id="memoryModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <h3 class="font-bold text-lg">Tambah Kenangan Federation</h3>
+            <h3 class="font-bold text-lg">Unggah Kenangan Federation</h3>
             <div>
-                <label class="block text-xs font-semibold mb-1">Pilih Foto Dokumentasi</label>
+                <label class="block text-xs font-semibold mb-1">Foto Dokumentasi</label>
                 <input type="file" id="memoryPhotoInput" accept="image/*" class="text-xs w-full">
-                <p class="text-[10px] text-slate-400 mt-1">*Foto dikompres otomatis agar optimal.</p>
-                <img id="memoryPhotoPreview" class="w-full h-36 rounded
+                <img id="memoryPhotoPreview" class="w-full h-36 rounded-xl object-cover mt-2 border border-slate-200 hidden">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Judul / Momen</label>
+                <input type="text" id="memoryTitle" placeholder="Contoh: Makrab & Studi Kelompok" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Keterangan Singkat</label>
+                <input type="text" id="memoryDesc" placeholder="Contoh: Keseruan di Ruang Kuliah 302" class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeMemoryModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveMemoryData()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold">Unggah</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK & LOGIKA UTAMA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDocs, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYGyegtTXogJqPyTsqSyrotaNta_QWxuc",
+            authDomain: "federation-unm--26.firebaseapp.com",
+            databaseURL: "https://federation-unm--26-default-rtdb.firebaseio.com",
+            projectId: "federation-unm--26",
+            storageBucket: "federation-unm--26.firebasestorage.app",
+            messagingSenderId: "458698625240",
+            appId: "1:458698625240:web:2e74af979ddb79d39a87ad",
+            measurementId: "G-ESEGM6FWLB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const adminEmails = [
+            "jubilantelioneyp@gmail.com",
+            "andimuhammadfaridirsal@gmail.com"
+        ];
+
+        let cachedStudents = [];
+        let cachedAssignments = [];
+        let cachedSchedule = [];
+        let cachedMemories = [];
+        let isAdmin = false;
+        let tempPhoto = "";
+        let tempMemoryPhoto = "";
+
+        const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
+
+        // EXACT 41 MAHASISWA KELAS F SESUAI SPREADSHEET
+        const defaultStudents = [
+            { id: "1", nim: "260901500058", name: "ANDI FIRDA SARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "2", nim: "260901500059", name: "NOVITA LATIEF", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "3", nim: "260901500060", name: "ANGGITA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "4", nim: "260901500061", name: "YUNANDA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "5", nim: "260901500062", name: "NUR ANISA FITRI", role: "Wakil Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "6", nim: "260901500063", name: "AULIA ASWANI ASWAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "7", nim: "260901500064", name: "NUR ANNISA AZ ZAHRA RUSDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "8", nim: "260901500065", name: "JELITA CAHYADI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "9", nim: "260901500066", name: "MIFTAH AZIRAH QIRAINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "10", nim: "260901500067", name: "ASMIRANDA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "11", nim: "260901500068", name: "RIANY PRATIWI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "12", nim: "260901500069", name: "NURUL FAUSIAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "13", nim: "260901500070", name: "NASTHAIN S. BUNTA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "14", nim: "260901501068", name: "JUBILANT ELIONEY PABALIK", role: "Keti", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "15", nim: "260901501069", name: "MUHAMMAD KHAIRIL ANWAR", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "16", nim: "260901501070", name: "ANDI MUH. FARID IRSAL", role: "Sekretaris", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "17", nim: "260901501071", name: "ROSALINA RINDING PADANG", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "18", nim: "260901501072", name: "NAFISAH AARIFAH ARIFUDDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "19", nim: "260901501074", name: "KEISHA SALSABILA MURSIDIN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "20", nim: "260901501075", name: "SYIFA NAFISAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "21", nim: "260901501076", name: "REZKY AMALYA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "22", nim: "260901501078", name: "NATALIA KRISSANTI NASIT SADIPUN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "23", nim: "260901501079", name: "NURHAFHIZAH HAMKA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "24", nim: "260901501080", name: "AMBAR WULANDARI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "25", nim: "260901501081", name: "NUR AZIZA TUNNAFSIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "26", nim: "260901501082", name: "AL GIBRAN RAMADHAN", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "27", nim: "260901501083", name: "NUR FITRAH SALEH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "28", nim: "260901501087", name: "AMANDA NUR HASANAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "29", nim: "260901502060", name: "NABILA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "30", nim: "260901502061", name: "ARISKA DWI AULIA J", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "31", nim: "260901502062", name: "NAJLA MUTHIAH ASDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "32", nim: "260901502063", name: "NADYA AFIFAH PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "33", nim: "260901502064", name: "NATASYA PUTRI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "34", nim: "260901502065", name: "EDITA NABILA AUDI", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "35", nim: "260901502066", name: "ANDI AULIA AZZAHRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "36", nim: "260901502067", name: "DAVINA ZAKIYAH PUTRI YUSLINRA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "37", nim: "260901502068", name: "NADIA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "38", nim: "260901502069", name: "LILIS KARLINA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "39", nim: "260901502070", name: "ARDIANSYAH", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "40", nim: "260901502072", name: "MEI LUNA INDA SARI S", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto },
+            { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
+        ];
+
+        const defaultAssignments = [
+            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
+        ];
+
+        const defaultSchedule = [
+            { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
+            { id: '2', day: 'Rabu', time: '10:30 - 13:00 WITA', course: 'Auditing 1', room: 'Lab Komputer' },
+            { id: '3', day: 'Kamis', time: '13:30 - 16:00 WITA', course: 'Literasi Sains, Teknologi & Seni', room: 'Ruang 302' }
+        ];
+
+        const defaultMemories = [
+            { id: '1', title: 'Pertemuan Perdana Kelas F', desc: 'Keseruan hari pertama perkuliahan S1 Akuntansi Kelas F 2026.', photo: defaultAvatarPhoto }
+        ];
+
+        // AUTO COMPRESSOR UNTUK FOTO UPLOAD MAHASISWA
+        document.getElementById('photoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 120;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        tempPhoto = canvas.toDataURL('image/jpeg', 0.6);
+                        document.getElementById('photoPreview').src = tempPhoto;
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // AUTO COMPRESSOR UNTUK FOTO KENANGAN
+        document.getElementById('memoryPhotoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const MAX_SIZE = 400;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+                        canvas.width = width; canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        tempMemoryPhoto = canvas.toDataURL('image/jpeg', 0.7);
+                        const preview = document.getElementById('memoryPhotoPreview');
+                        preview.src = tempMemoryPhoto;
+                        preview.classList.remove('hidden');
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('btnLogin').addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try { await signInWithPopup(auth, provider); } catch(e) { console.error("Gagal login:", e); }
+        });
+
+        document.getElementById('btnLogoutBanner').addEventListener('click', async () => {
+            try { await signOut(auth); } catch(e) { console.error("Gagal logout:", e); }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            const authContainer = document.getElementById('authContainer');
+            const adminBanner = document.getElementById('adminBanner');
+            const btnAddStudent = document.getElementById('btnAddStudent');
+            const btnAddAssignment = document.getElementById('btnAddAssignment');
+            const btnAddSchedule = document.getElementById('btnAddSchedule');
+            const btnAddMemory = document.getElementById('btnAddMemory');
+            const adminAttendanceActions = document.getElementById('adminAttendanceActions');
+            const userStatusText = document.getElementById('userStatusText');
+
+            if (user) {
+                userStatusText.innerText = `Login: ${user.displayName || user.email}`;
+                authContainer.innerHTML = `<button id="btnLogoutTop" class="bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">Logout</button>`;
+                document.getElementById('btnLogoutTop').addEventListener('click', async () => { await signOut(auth); });
+                
+                if (adminEmails.includes(user.email)) {
+                    isAdmin = true;
+                    adminBanner.classList.remove('hidden');
+                    btnAddStudent.classList.remove('hidden'); btnAddStudent.classList.add('flex');
+                    btnAddAssignment.classList.remove('hidden'); btnAddAssignment.classList.add('flex');
+                    btnAddSchedule.classList.remove('hidden'); btnAddSchedule.classList.add('flex');
+                    btnAddMemory.classList.remove('hidden'); btnAddMemory.classList.add('flex');
+                    adminAttendanceActions.classList.remove('hidden'); adminAttendanceActions.classList.add('flex');
+                } else {
+                    isAdmin = false;
+                    adminBanner.classList.add('hidden');
+                    btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
+                    btnAddSchedule.classList.add('hidden'); btnAddMemory.classList.add('hidden');
+                    adminAttendanceActions.classList.add('hidden');
+                }
+            } else {
+                userStatusText.innerText = "Silakan login Google untuk akses penuh.";
+                authContainer.innerHTML = `<button id="btnLoginAgain" class="bg-white text-indigo-900 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-slate-100 flex items-center space-x-2"><i class="fa-brands fa-google text-red-500"></i><span>Login Google</span></button>`;
+                document.getElementById('btnLoginAgain').addEventListener('click', async () => {
+                    const provider = new GoogleAuthProvider();
+                    try { await signInWithPopup(auth, provider); } catch(e) { console.error("Gagal login:", e); }
+                });
+                isAdmin = false;
+                adminBanner.classList.add('hidden');
+                btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
+                btnAddSchedule.classList.add('hidden'); btnAddMemory.classList.add('hidden');
+                adminAttendanceActions.classList.add('hidden');
+            }
+            loadCloudData();
+        });
+
+        async function loadCloudData() {
+            try {
+                const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
+                if (!studSnap.empty) {
+                    cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedStudents = defaultStudents;
+                    for (let s of defaultStudents) { await setDoc(doc(db, "students_v7_kelasF", s.id), s); }
+                }
+
+                const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
+                if (!schedSnap.empty) {
+                    cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedSchedule = defaultSchedule;
+                    for (let sch of defaultSchedule) { await setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch); }
+                }
+
+                const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
+                if (!assignSnap.empty) {
+                    cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedAssignments = defaultAssignments;
+                    for (let a of defaultAssignments) { await setDoc(doc(db, "assignments_v7_kelasF", a.id), a); }
+                }
+
+                const memSnap = await getDocs(collection(db, "memories_v7_kelasF"));
+                if (!memSnap.empty) {
+                    cachedMemories = memSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedMemories = defaultMemories;
+                    for (let m of defaultMemories) { await setDoc(doc(db, "memories_v7_kelasF", m.id), m); }
+                }
+            } catch (err) {
+                console.error("Error loading cloud data:", err);
+            }
+            renderAll();
+        }
+
+        function renderAll() {
+            renderStudents();
+            renderSchedule();
+            renderAttendance();
+            updateCourseFilterOptions();
+            renderCourseAttendance();
+            renderAssignments();
+            renderMemories();
+            checkDeadlineAlerts();
+            updateAbsentSummaryWidget();
+            checkScheduleReminder();
+        }
+
+        function updateAbsentSummaryWidget() {
+            const absentList = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
+            const container = document.getElementById('absentNamesContainer');
+            const countBadge = document.getElementById('absentCountBadge');
+            const summaryText = document.getElementById('absentSummaryText');
+
+            countBadge.innerText = `${absentList.length} Mahasiswa`;
+            summaryText.innerText = `Dari total ${cachedStudents.length} anggota, terdapat ${absentList.length} mahasiswa yang berstatus Tidak Hadir (Izin/Sakit/Alpa) hari ini.`;
+
+            if (absentList.length === 0) {
+                container.innerHTML = `<span class="text-emerald-400 italic font-medium">✨ Semua mahasiswa tercatat hadir hari ini.</span>`;
+            } else {
+                container.innerHTML = absentList.map(s => `
+                    <div class="flex items-center justify-between bg-indigo-900/80 px-2.5 py-1 rounded border border-indigo-700/60">
+                        <span class="font-semibold truncate mr-2">${s.name}</span>
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function checkScheduleReminder() {
+            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayName = daysMap[new Date().getDay()];
+            const todaysClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            const reminderText = document.getElementById('scheduleReminderText');
+            const reminderBanner = document.getElementById('scheduleReminderBanner');
+
+            if (todaysClasses.length > 0) {
+                reminderBanner.classList.remove('hidden');
+                let classDetails = todaysClasses.map(c => `<strong class="text-amber-950">${c.course}</strong> (${c.time} di ${c.room})`).join(', ');
+                reminderText.innerHTML = `Hari ini hari <strong>${todayName}</strong>. Jadwal perkuliahan: ${classDetails}. Persiapkan diri dan kelengkapan tugasmu!`;
+            } else {
+                reminderBanner.classList.add('hidden');
+            }
+        }
+
+        function renderStudents() {
+            let grid = document.getElementById('studentsGrid');
+            document.getElementById('studentCountText').innerText = cachedStudents.length;
+            grid.innerHTML = cachedStudents.map(s => `
+                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
+                        <div class="flex-1 min-w-0">
+                            <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
+                            <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
+                            <p class="text-xs font-mono text-slate-500">${s.nim}</p>
+                        </div>
+                        ${isAdmin ? `<button onclick="window.openEditModal('${s.id}')" class="text-indigo-600 p-2 hover:bg-indigo-50 rounded"><i class="fa-solid fa-pen"></i></button>` : ''}
+                    </div>
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-slate-400 font-medium text-[11px]">Rekap Harian:</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance || 'Hadir'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSchedule() {
+            let container = document.getElementById('scheduleGrid');
+            if (cachedSchedule.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada jadwal kuliah yang ditambahkan.</p>`;
+                return;
+            }
+            container.innerHTML = cachedSchedule.map(s => `
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative">
+                    <span class="text-xs font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded">${s.day}</span>
+                    <h4 class="font-bold text-slate-800 mt-2">${s.course}</h4>
+                    <p class="text-xs text-slate-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${s.time}</p>
+                    <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i> ${s.room}</p>
+                    ${isAdmin ? `<div class="mt-3 pt-2 border-t flex justify-end"><button onclick="window.deleteSchedule('${s.id}')" class="text-rose-600 text-xs font-semibold hover:underline"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.openAddScheduleModal = function() {
+            document.getElementById('schedTime').value = "";
+            document.getElementById('schedCourse').value = "";
+            document.getElementById('schedRoom').value = "";
+            document.getElementById('scheduleModal').classList.remove('hidden');
+        }
+
+        window.closeScheduleModal = function() { document.getElementById('scheduleModal').classList.add('hidden'); }
+
+        window.saveScheduleData = async function() {
+            let day = document.getElementById('schedDay').value;
+            let time = document.getElementById('schedTime').value;
+            let course = document.getElementById('schedCourse').value;
+            let room = document.getElementById('schedRoom').value;
+            if (!course || !time) return alert("Mata kuliah dan jam wajib diisi!");
+            let item = { id: Date.now().toString(), day, time, course, room: room || "Ruang Kuliah" };
+            cachedSchedule.push(item);
+            closeScheduleModal();
+            renderSchedule();
+            updateCourseFilterOptions();
+            checkScheduleReminder();
+            await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
+        }
+
+        window.deleteSchedule = async function(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
+                cachedSchedule = cachedSchedule.filter(s => s.id !== id);
+                renderSchedule();
+                updateCourseFilterOptions();
+                checkScheduleReminder();
+                await deleteDoc(doc(db, "schedules_v7_kelasF", id));
+            }
+        }
+
+        function renderAttendance() {
+            let tbody = document.getElementById('attendanceTableBody');
+            tbody.innerHTML = cachedStudents.map((s, idx) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                        <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                        <span>${s.name}</span>
+                    </td>
+                    <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-600">${s.role}</span></td>
+                    <td class="p-3 text-center">
+                        ${isAdmin ? `
+                            <select onchange="window.updateAttendance('${s.id}', this.value)" class="text-xs border rounded px-2 py-1 font-semibold focus:ring-2 focus:ring-indigo-500">
+                                <option value="Hadir" ${s.attendance === 'Hadir' ? 'selected' : ''}>Hadir</option>
+                                <option value="Izin" ${s.attendance === 'Izin' ? 'selected' : ''}>Izin</option>
+                                <option value="Sakit" ${s.attendance === 'Sakit' ? 'selected' : ''}>Sakit</option>
+                                <option value="Alpa" ${s.attendance === 'Alpa' ? 'selected' : ''}>Alpa</option>
+                            </select>
+                        ` : `<span class="px-2.5 py-1 text-xs font-semibold rounded ${getAttendanceClass(s.attendance)}">${s.attendance || 'Hadir'}</span>`}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateCourseFilterOptions() {
+            const filterSelect = document.getElementById('courseFilterSelect');
+            const courses = Array.from(new Set(cachedSchedule.map(s => s.course)));
+            filterSelect.innerHTML = `<option value="Semua">Semua Mata Kuliah</option>` + 
+                courses.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        window.renderCourseAttendance = function() {
+            const tbody = document.getElementById('courseAttendanceTableBody');
+            const selectedCourse = document.getElementById('courseFilterSelect').value;
+            tbody.innerHTML = cachedStudents.map((s, idx) => {
+                const totalPertemuan = 16;
+                let hadir = totalPertemuan;
+                let izinSakit = 0;
+                let alpa = 0;
+                if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
+                    izinSakit = 1; hadir -= 1;
+                } else if (s.attendance === 'Alpa') {
+                    alpa = 1; hadir -= 1;
+                }
+                const percentage = Math.round((hadir / totalPertemuan) * 100);
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                            <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                            <span>${s.name}</span>
+                        </td>
+                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                        <td class="p-3 text-center text-xs font-semibold text-indigo-700">${selectedCourse}</td>
+                        <td class="p-3 text-center font-mono text-xs">${totalPertemuan}</td>
+                        <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
+                        <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
+                        <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                ${percentage}%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getAttendanceClass(att) {
+            switch(att) {
+                case 'Hadir': return 'bg-emerald-100 text-emerald-800';
+                case 'Izin': return 'bg-amber-100 text-amber-800';
+                case 'Sakit': return 'bg-blue-100 text-blue-800';
+                case 'Alpa': return 'bg-rose-100 text-rose-800';
+                default: return 'bg-slate-100 text-slate-800';
+            }
+        }
+
+        window.updateAttendance = async function(id, val) {
+            let s = cachedStudents.find(x => x.id === id);
+            if (s) {
+                s.attendance = val;
+                renderAttendance();
+                renderStudents();
+                renderCourseAttendance();
+                updateAbsentSummaryWidget();
+                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
+            }
+        }
+
+        window.setBulkAttendance = async function(val) {
+            cachedStudents.forEach(s => s.attendance = val);
+            renderAttendance();
+            renderStudents();
+            renderCourseAttendance();
+            updateAbsentSummaryWidget();
+            for (let s of cachedStudents) { await setDoc(doc(db, "students_v7_kelasF", s.id), s); }
+        }
+
+        function checkDeadlineAlerts() {
+            const today = new Date();
+            let urgentTasks = [];
+            cachedAssignments.forEach(a => {
+                if (a.deadlineDate) {
+                    const deadline = new Date(a.deadlineDate);
+                    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0 && diffDays <= 3) {
+                        urgentTasks.push(`${a.title} (${diffDays === 0 ? 'Hari ini!' : diffDays + ' hari lagi'})`);
+                    }
+                }
+            });
+            const alertContainer = document.getElementById('deadlineAlertContainer');
+            const alertText = document.getElementById('deadlineAlertText');
+            const badge = document.getElementById('assignmentBadge');
+            if (urgentTasks.length > 0) {
+                alertContainer.classList.remove('hidden');
+                badge.classList.remove('hidden');
+                alertText.innerText = `Segera selesaikan tugas berikut: ${urgentTasks.join(', ')}.`;
+            } else {
+                alertContainer.classList.add('hidden');
+                badge.classList.add('hidden');
+            }
+        }
+
+        function renderAssignments() {
+            let container = document.getElementById('assignmentsList');
+            if (cachedAssignments.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada tugas atau pengumuman.</p>`;
+                return;
+            }
+            const today = new Date();
+            container.innerHTML = cachedAssignments.map(a => {
+                let badgeHTML = "";
+                if (a.deadlineDate) {
+                    const deadline = new Date(a.deadlineDate);
+                    const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays < 0) {
+                        badgeHTML = `<span class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">Lewat Deadline</span>`;
+                    } else if (diffDays <= 3) {
+                        badgeHTML = `<span class="bg-rose-100 text-rose-700 text-[10px] px-2 py-0.5 rounded font-bold animate-pulse">🔥 Deadline Dekat (${diffDays === 0 ? 'Hari ini' : diffDays + ' hari lagi'})</span>`;
+                    } else {
+                        badgeHTML = `<span class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-0.5 rounded font-bold">${diffDays} Hari Lagi</span>`;
+                    }
+                }
+                return `
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm relative">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-100">${a.course}</span>
+                            ${badgeHTML}
+                        </div>
+                        <h3 class="font-bold text-slate-800 mt-2">${a.title}</h3>
+                        <p class="text-xs text-slate-600 mt-2">${a.desc}</p>
+                        <div class="mt-4 pt-3 border-t flex items-center justify-between text-xs text-slate-500">
+                            <span><i class="fa-regular fa-clock mr-1"></i> Tenggat: <strong class="text-rose-600">${a.deadlineDate || 'Segera'}</strong></span>
+                            ${isAdmin ? `<button onclick="window.deleteAssignment('${a.id}')" class="text-rose-600 hover:underline font-semibold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // FUNGSI RENDER KENANGAN
+        function renderMemories() {
+            let container = document.getElementById('memoriesGrid');
+            if (cachedMemories.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada foto kenangan yang diunggah.</p>`;
+                return;
+            }
+            container.innerHTML = cachedMemories.map(m => `
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                    <img src="${m.photo || defaultAvatarPhoto}" class="w-full h-40 object-cover">
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">${m.title}</h4>
+                            <p class="text-xs text-slate-500 mt-1">${m.desc}</p>
+                        </div>
+                        ${isAdmin ? `<div class="mt-4 pt-2 border-t flex justify-end"><button onclick="window.deleteMemory('${m.id}')" class="text-rose-600 text-xs font-semibold hover:underline"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.openAddMemoryModal = function() {
+            document.getElementById('memoryTitle').value = "";
+            document.getElementById('memoryDesc').value = "";
+            document.getElementById('memoryPhotoInput').value = "";
+            document.getElementById('memoryPhotoPreview').classList.add('hidden');
+            tempMemoryPhoto = "";
+            document.getElementById('memoryModal').classList.remove('hidden');
+        }
+
+        window.closeMemoryModal = function() { document.getElementById('memoryModal').classList.add('hidden'); }
+
+        window.saveMemoryData = async function() {
+            let title = document.getElementById('memoryTitle').value;
+            let desc = document.getElementById('memoryDesc').value;
+            if (!title) return alert("Judul kenangan wajib diisi!");
+
+            let item = {
+                id: Date.now().toString(),
+                title,
+                desc: desc || "Kebersamaan Kelas F",
+                photo: tempMemoryPhoto || defaultAvatarPhoto
+            };
+
+            cachedMemories.push(item);
+            closeMemoryModal();
+            renderMemories();
+
+            await setDoc(doc(db, "memories_v7_kelasF", item.id), item);
+        }
+
+        window.deleteMemory = async function(id) {
+            if (confirm("Hapus foto kenangan ini?")) {
+                cachedMemories = cachedMemories.filter(m => m.id !== id);
+                renderMemories();
+                await deleteDoc(doc(db, "memories_v7_kelasF", id));
+            }
+        }
+
+        window.openAddAssignmentModal = function() {
+            document.getElementById('assignCourse').value = "";
+            document.getElementById('assignTitle').value = "";
+            document.getElementById('assignDeadlineDate').value = "";
+            document.getElementById('assignDesc').value = "";
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        window.closeAssignmentModal = function() { document.getElementById('assignmentModal').classList.add('hidden'); }
+
+        window.saveAssignmentData = async function() {
+            let course = document.getElementById('assignCourse').value;
+            let title = document.getElementById('assignTitle').value;
+            let deadlineDate = document.getElementById('assignDeadlineDate').value;
+            let desc = document.getElementById('assignDesc').value;
+            if (!title) return alert("Judul wajib diisi!");
+            let item = { id: Date.now().toString(), course: course || "Pengumuman Kelas", title, deadlineDate: deadlineDate || "", desc };
+            cachedAssignments.push(item);
+            closeAssignmentModal();
+            renderAssignments();
+            checkDeadlineAlerts();
+            await setDoc(doc(db, "assignments_v7_kelasF", item.id), item);
+        }
+
+        window.deleteAssignment = async function(id) {
+            if (confirm("Apakah Anda yakin ingin menghapus pengumuman/tugas ini?")) {
+                cachedAssignments = cachedAssignments.filter(a => a.id !== id);
+                renderAssignments();
+                checkDeadlineAlerts();
+                await deleteDoc(doc(db, "assignments_v7_kelasF", id));
+            }
+        }
+
+        window.switchTab = function(tabKey) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-indigo-600', 'text-indigo-600');
+                el.classList.add('border-transparent', 'text-slate-500');
+            });
+            document.getElementById(`tabContent-${tabKey}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tabBtn-${tabKey}`);
+            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+            activeBtn.classList.add('border-indigo-600', 'text-indigo-600');
+        }
+
+        window.openAddModal = function() {
+            if (!isAdmin) return alert("Hanya Keti / Admin yang dapat menambah data.");
+            document.getElementById('editId').value = "";
+            document.getElementById('editName').value = "";
+            document.getElementById('editNim').value = `26090150${(cachedStudents.length+1).toString().padStart(4,'0')}`;
+            document.getElementById('photoPreview').src = defaultAvatarPhoto;
+            tempPhoto = "";
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
+
+        window.openEditModal = function(id) {
+            let s = cachedStudents.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('editId').value = s.id;
+            document.getElementById('editName').value = s.name;
+            document.getElementById('editNim').value = s.nim;
+            document.getElementById('editRole').value = s.role;
+            document.getElementById('photoPreview').src = s.photo || defaultAvatarPhoto;
+            tempPhoto = s.photo || "";
+            document.getElementById('studentModal').classList.remove('hidden');
+        }
+
+        window.closeModal = function() { document.getElementById('studentModal').classList.add('hidden'); }
+
+        window.saveStudentData = async function() {
+            let id = document.getElementById('editId').value;
+            let name = document.getElementById('editName').value;
+            let nim = document.getElementById('editNim').value;
+            let role = document.getElementById('editRole').value;
+            if (!name) return alert("Nama wajib diisi!");
+            let s = null;
+            if (id) {
+                s = cachedStudents.find(x => x.id === id);
+                if (s) { s.name = name; s.nim = nim; s.role = role; if (tempPhoto) s.photo = tempPhoto; }
+            } else {
+                s = { id: Date.now().toString(), name, nim, role, attendance: 'Hadir', photo: tempPhoto || defaultAvatarPhoto };
+                cachedStudents.push(s);
+            }
+            closeModal();
+            renderStudents();
+            renderAttendance();
+            renderCourseAttendance();
+            updateAbsentSummaryWidget();
+            await setDoc(doc(db, "students_v7_kelasF", s.id), s);
+        }
+    </script>
+</body>
+</html>
