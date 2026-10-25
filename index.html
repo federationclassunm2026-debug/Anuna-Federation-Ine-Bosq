@@ -585,7 +585,10 @@
                 <div class="bg-white p-4 rounded-xl border shadow-sm flex items-center space-x-3">
                     <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
                     <div class="flex-1 min-w-0">
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${getAttendanceClass(s.attendance)}">${s.attendance || 'Hadir'}</span>
+                        </div>
                         <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
                         <p class="text-xs font-mono text-slate-500">${s.nim}</p>
                     </div>
@@ -686,6 +689,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
+                renderStudents();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -693,6 +697,7 @@
         window.setBulkAttendance = async function(val) {
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
+            renderStudents();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
