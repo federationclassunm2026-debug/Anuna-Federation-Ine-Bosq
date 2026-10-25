@@ -57,15 +57,11 @@
             </button>
             <button onclick="switchTab('schedule')" id="tabBtn-schedule" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
                 <i class="fa-solid fa-calendar-days"></i>
-                <span>Jadwal Kuliah</span>
+                <span>Jadwal Kuliah & Rekap Matkul</span>
             </button>
             <button onclick="switchTab('attendance')" id="tabBtn-attendance" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
                 <i class="fa-solid fa-clipboard-user"></i>
                 <span>Absensi Kelas</span>
-            </button>
-            <button onclick="switchTab('course-attendance')" id="tabBtn-course-attendance" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Rekap Per Matkul</span>
             </button>
             <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
@@ -136,9 +132,9 @@
             </div>
         </section>
 
-        <!-- TAB 2: JADWAL KULIAH -->
-        <section id="tabContent-schedule" class="tab-content hidden">
-            <div id="scheduleReminderBanner" class="bg-amber-50 border border-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start space-x-3">
+        <!-- TAB 2: JADWAL KULIAH & REKAP PER MATKUL TERINTEGRASI -->
+        <section id="tabContent-schedule" class="tab-content hidden space-y-6">
+            <div id="scheduleReminderBanner" class="bg-amber-50 border border-amber-200 p-5 rounded-2xl shadow-sm flex items-start space-x-3">
                 <div class="p-2.5 bg-amber-500 text-white rounded-xl shadow">
                     <i class="fa-solid fa-bell text-base animate-bounce"></i>
                 </div>
@@ -148,11 +144,12 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
+            <!-- BAGIAN JADWAL KULIAH MINGGUAN -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800">Jadwal Kuliah Mingguan Kelas F</h2>
-                        <p class="text-xs text-slate-500">Jadwal resmi perkuliahan S1 Akuntansi Kelas F 2026.</p>
+                        <p class="text-xs text-slate-500">Pilih mata kuliah untuk melihat rekap absensi spesifik.</p>
                     </div>
                     <button id="btnAddSchedule" onclick="openAddScheduleModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold items-center space-x-2 shadow">
                         <i class="fa-solid fa-plus"></i><span>Tambah Jadwal</span>
@@ -160,6 +157,43 @@
                 </div>
                 <div id="scheduleGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- Rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- BAGIAN REKAP PRESENSI TERINTEGRASI -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Rekap Kehadiran: <span id="activeSelectedCourseTitle" class="text-indigo-600">Semua Mata Kuliah</span></h2>
+                        <p class="text-xs text-slate-500">Akumulasi kehadiran mahasiswa berdasarkan mata kuliah.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <select id="courseFilterSelect" onchange="filterCourseAttendanceBySelect()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
+                            <option value="Semua">Semua Mata Kuliah</option>
+                        </select>
+                        <button id="btnManageCourses" onclick="openCourseManagerModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold items-center space-x-1 shadow">
+                            <i class="fa-solid fa-gear"></i><span>Kelola Matkul</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-xs border-b">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Mahasiswa</th>
+                                <th class="p-3">NIM</th>
+                                <th class="p-3 text-center">Total Pertemuan</th>
+                                <th class="p-3 text-center">Hadir</th>
+                                <th class="p-3 text-center">Izin / Sakit</th>
+                                <th class="p-3 text-center">Alpa</th>
+                                <th class="p-3 text-center">Persentase</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseAttendanceTableBody" class="divide-y divide-slate-100">
+                            <!-- Rendered dynamically -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>
@@ -196,47 +230,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: REKAP KEHADIRAN PER MATA KULIAH (DAPAT DIATUR ADMIN) -->
-        <section id="tabContent-course-attendance" class="tab-content hidden">
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Rekap Kehadiran Per Mata Kuliah</h2>
-                        <p class="text-xs text-slate-500">Pantau akumulasi presensi mahasiswa per mata kuliah.</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <select id="courseFilterSelect" onchange="renderCourseAttendance()" class="text-xs border border-slate-300 rounded-lg px-3 py-2 font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
-                            <option value="Semua">Semua Mata Kuliah</option>
-                        </select>
-                        <button id="btnManageCourses" onclick="openCourseManagerModal()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-semibold items-center space-x-1 shadow">
-                            <i class="fa-solid fa-gear"></i><span>Kelola Matkul & Pertemuan</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-xs border-b">
-                            <tr>
-                                <th class="p-3">No</th>
-                                <th class="p-3">Mahasiswa</th>
-                                <th class="p-3">NIM</th>
-                                <th class="p-3 text-center">Mata Kuliah</th>
-                                <th class="p-3 text-center">Total Pertemuan</th>
-                                <th class="p-3 text-center">Hadir</th>
-                                <th class="p-3 text-center">Izin / Sakit</th>
-                                <th class="p-3 text-center">Alpa</th>
-                                <th class="p-3 text-center">Persentase</th>
-                            </tr>
-                        </thead>
-                        <tbody id="courseAttendanceTableBody" class="divide-y divide-slate-100">
-                            <!-- Rendered dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
                 <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg mt-0.5"></i>
@@ -260,7 +254,7 @@
             </div>
         </section>
 
-        <!-- TAB 6: KENANGAN FEDERATION -->
+        <!-- TAB 5: KENANGAN FEDERATION -->
         <section id="tabContent-memories" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -276,7 +270,7 @@
             </div>
         </section>
 
-        <!-- TAB 7: FEDERATION CURHAT -->
+        <!-- TAB 6: FEDERATION CURHAT -->
         <section id="tabContent-curhat" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -533,7 +527,6 @@
         let classLogoUrl = "";
 
         const defaultAvatarPhoto = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23ff9900'/><circle cx='50' cy='35' r='18' fill='%23ffffff' stroke='%23000000' stroke-width='4'/><path d='M 15 90 Q 50 50 85 90 Z' fill='%23ffffff' stroke='%23000000' stroke-width='4'/></svg>";
-
         const defaultLogoSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%234338ca'/><path d='M 50 15 L 85 35 L 50 55 L 15 35 Z' fill='%23fbbf24'/><path d='M 25 50 L 25 70 C 25 80 50 85 50 85 C 50 85 75 80 75 70 L 75 50 L 50 65 Z' fill='%236366f1'/></svg>";
 
         const defaultStudents = [
@@ -821,7 +814,6 @@
             checkScheduleReminder();
         }
 
-        // FUNGSI MODAL LOGO
         window.openLogoModal = function() {
             if (!isAdmin) return;
             tempLogoPhoto = classLogoUrl;
@@ -843,7 +835,6 @@
             alert("Logo kelas berhasil diperbarui!");
         }
 
-        // FUNGSI MODAL KELOLA MATA KULIAH & PERTEMUAN
         window.openCourseManagerModal = function() {
             renderCourseConfigList();
             document.getElementById('newCourseName').value = "";
@@ -983,14 +974,29 @@
                 return;
             }
             container.innerHTML = cachedSchedule.map(s => `
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative">
-                    <span class="text-xs font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded">${s.day}</span>
-                    <h4 class="font-bold text-slate-800 mt-2">${s.course}</h4>
-                    <p class="text-xs text-slate-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${s.time}</p>
-                    <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i> ${s.room}</p>
-                    ${isAdmin ? `<div class="mt-3 pt-2 border-t flex justify-end"><button onclick="window.deleteSchedule('${s.id}')" class="text-rose-600 text-xs font-semibold hover:underline"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></div>` : ''}
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative flex flex-col justify-between">
+                    <div>
+                        <span class="text-xs font-bold bg-indigo-600 text-white px-2.5 py-0.5 rounded">${s.day}</span>
+                        <h4 class="font-bold text-slate-800 mt-2">${s.course}</h4>
+                        <p class="text-xs text-slate-500 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${s.time}</p>
+                        <p class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot mr-1"></i> ${s.room}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
+                        <button onclick="window.selectCourseForAttendance('${s.course}')" class="text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded text-xs font-semibold flex items-center space-x-1">
+                            <i class="fa-solid fa-chart-pie"></i><span>Lihat Rekap Presensi</span>
+                        </button>
+                        ${isAdmin ? `<button onclick="window.deleteSchedule('${s.id}')" class="text-rose-600 text-xs font-semibold hover:underline"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>` : ''}
+                    </div>
                 </div>
             `).join('');
+        }
+
+        window.selectCourseForAttendance = function(courseName) {
+            const selectEl = document.getElementById('courseFilterSelect');
+            selectEl.value = courseName;
+            renderCourseAttendance();
+            // Scroll ke tabel rekap di bawah
+            document.getElementById('courseAttendanceTableBody').scrollIntoView({ behavior: 'smooth' });
         }
 
         window.openAddScheduleModal = function() {
@@ -1058,52 +1064,52 @@
                 cachedCourses.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         }
 
+        window.filterCourseAttendanceBySelect = function() {
+            renderCourseAttendance();
+        }
+
         window.renderCourseAttendance = function() {
             const tbody = document.getElementById('courseAttendanceTableBody');
             const selectedCourseName = document.getElementById('courseFilterSelect').value;
+            document.getElementById('activeSelectedCourseTitle').innerText = selectedCourseName;
 
-            let targetCourses = selectedCourseName === 'Semua' ? cachedCourses : cachedCourses.filter(c => c.name === selectedCourseName);
-            if (targetCourses.length === 0) targetCourses = [{ name: selectedCourseName, totalMeetings: 16 }];
+            let totalMeetings = 16;
+            if (selectedCourseName !== 'Semua') {
+                let found = cachedCourses.find(c => c.name === selectedCourseName);
+                if (found) totalMeetings = found.totalMeetings;
+            }
 
-            let rowsHTML = "";
-            let counter = 1;
+            tbody.innerHTML = cachedStudents.map((s, idx) => {
+                let hadir = totalMeetings;
+                let izinSakit = 0;
+                let alpa = 0;
+                if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
+                    izinSakit = 1; hadir -= 1;
+                } else if (s.attendance === 'Alpa') {
+                    alpa = 1; hadir -= 1;
+                }
+                const percentage = Math.round((hadir / totalMeetings) * 100);
 
-            cachedStudents.forEach((s) => {
-                targetCourses.forEach(course => {
-                    const totalPertemuan = course.totalMeetings || 16;
-                    let hadir = totalPertemuan;
-                    let izinSakit = 0;
-                    let alpa = 0;
-                    if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
-                        izinSakit = 1; hadir -= 1;
-                    } else if (s.attendance === 'Alpa') {
-                        alpa = 1; hadir -= 1;
-                    }
-                    const percentage = Math.round((hadir / totalPertemuan) * 100);
-
-                    rowsHTML += `
-                        <tr class="hover:bg-slate-50">
-                            <td class="p-3 text-xs text-slate-400 font-mono">${counter++}</td>
-                            <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
-                                <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
-                                <span>${s.name}</span>
-                            </td>
-                            <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
-                            <td class="p-3 text-center text-xs font-semibold text-indigo-700">${course.name}</td>
-                            <td class="p-3 text-center font-mono text-xs">${totalPertemuan}</td>
-                            <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
-                            <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
-                            <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
-                            <td class="p-3 text-center">
-                                <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                                    ${percentage}%
-                                </span>
-                            </td>
-                        </tr>
-                    `;
-                });
-            });
-            tbody.innerHTML = rowsHTML;
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
+                        <td class="p-3 font-semibold text-slate-800 flex items-center space-x-2">
+                            <img src="${s.photo || defaultAvatarPhoto}" class="w-7 h-7 rounded-full object-cover">
+                            <span>${s.name}</span>
+                        </td>
+                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
+                        <td class="p-3 text-center font-mono text-xs">${totalMeetings}</td>
+                        <td class="p-3 text-center font-mono text-xs text-emerald-600 font-bold">${hadir}</td>
+                        <td class="p-3 text-center font-mono text-xs text-amber-600 font-bold">${izinSakit}</td>
+                        <td class="p-3 text-center font-mono text-xs text-rose-600 font-bold">${alpa}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 text-xs font-bold rounded ${percentage >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                ${percentage}%
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
         function getAttendanceClass(att) {
