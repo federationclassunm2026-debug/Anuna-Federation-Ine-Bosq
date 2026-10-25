@@ -470,7 +470,7 @@
                     await Promise.all(defaultSchedule.map(sch => setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch)));
                 }
 
-                // 3. Pengumuman & Tugas
+                // 3. Pengumuman & Tugas (Tugas default otomatis disimpan ke cloud jika belum ada agar bisa dihapus)
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -798,7 +798,7 @@
         window.saveStudentData = async function() {
             let id = document.getElementById('editId').value;
             let name = document.getElementById('editName').value;
-            let nim = document.getElementById('editNim').value;
+            let nim = document.getElementById('editNim'].value;
             let role = document.getElementById('editRole').value;
 
             if (!name) return alert("Nama wajib diisi!");
