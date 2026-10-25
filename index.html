@@ -73,6 +73,25 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
+            
+            <!-- WIDGET RINGKASAN & DAFTAR TIDAK HADIR HARI INI -->
+            <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <span class="bg-indigo-700 text-amber-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Status Harian Kelas</span>
+                    <h3 class="text-lg font-bold mt-2">Rekap Ketidakhadiran Hari Ini</h3>
+                    <p class="text-xs text-indigo-200 mt-1" id="absentSummaryText">Memuat data ketidakhadiran...</p>
+                </div>
+                <div class="bg-indigo-950/60 p-4 rounded-xl border border-indigo-700/50 w-full md:w-auto min-w-[280px]">
+                    <div class="text-xs font-semibold text-indigo-300 mb-2 flex items-center justify-between">
+                        <span><i class="fa-solid fa-user-xmark mr-1.5 text-rose-400"></i> Daftar Mahasiswa Tidak Hadir:</span>
+                        <span id="absentCountBadge" class="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">0 Nihil</span>
+                    </div>
+                    <div id="absentNamesContainer" class="max-h-24 overflow-y-auto custom-scrollbar text-xs space-y-1">
+                        <span class="text-emerald-400 italic font-medium">Semua mahasiswa hadir hari ini.</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
@@ -87,8 +106,20 @@
             </div>
         </section>
 
-        <!-- TAB 2: JADWAL KULIAH -->
+        <!-- TAB 2: JADWAL KULIAH & PENGINGAT MATKUL -->
         <section id="tabContent-schedule" class="tab-content hidden">
+            
+            <!-- WIDGET PENGINGAT MATAKULIAH HARI INI -->
+            <div id="scheduleReminderBanner" class="bg-amber-50 border border-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start space-x-3">
+                <div class="p-2.5 bg-amber-500 text-white rounded-xl shadow">
+                    <i class="fa-solid fa-bell text-base animate-bounce"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm text-amber-900 mb-1">Pengingat Jadwal Kuliah Hari Ini</h4>
+                    <p id="scheduleReminderText" class="text-xs text-amber-800">Memeriksa jadwal kuliah hari ini...</p>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -137,7 +168,7 @@
             </div>
         </section>
 
-        <!-- TAB MENU BARU: REKAP KEHADIRAN PER MATA KULIAH -->
+        <!-- TAB 4: REKAP KEHADIRAN PER MATA KULIAH -->
         <section id="tabContent-course-attendance" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
@@ -174,7 +205,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
             <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
@@ -524,9 +555,50 @@
             renderCourseAttendance();
             renderAssignments();
             checkDeadlineAlerts();
+            updateAbsentSummaryWidget();
+            checkScheduleReminder();
         }
 
-        // TAMBAHAN: Kolom rekap harian pada direktori mahasiswa
+        // FUNGSI WIDGET REKAP KETIDAKHADIRAN
+        function updateAbsentSummaryWidget() {
+            const absentList = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
+            const container = document.getElementById('absentNamesContainer');
+            const countBadge = document.getElementById('absentCountBadge');
+            const summaryText = document.getElementById('absentSummaryText');
+
+            countBadge.innerText = `${absentList.length} Mahasiswa`;
+            summaryText.innerText = `Dari total ${cachedStudents.length} anggota, terdapat ${absentList.length} mahasiswa yang berstatus Tidak Hadir (Izin/Sakit/Alpa) hari ini.`;
+
+            if (absentList.length === 0) {
+                container.innerHTML = `<span class="text-emerald-400 italic font-medium">✨ Semua mahasiswa tercatat hadir hari ini.</span>`;
+            } else {
+                container.innerHTML = absentList.map(s => `
+                    <div class="flex items-center justify-between bg-indigo-900/80 px-2.5 py-1 rounded border border-indigo-700/60">
+                        <span class="font-semibold truncate mr-2">${s.name}</span>
+                        <span class="px-1.5 py-0.5 text-[9px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // FUNGSI PENGINGAT JADWAL KULIAH HARI INI
+        function checkScheduleReminder() {
+            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayName = daysMap[new Date().getDay()];
+            
+            const todaysClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            const reminderText = document.getElementById('scheduleReminderText');
+            const reminderBanner = document.getElementById('scheduleReminderBanner');
+
+            if (todaysClasses.length > 0) {
+                reminderBanner.classList.remove('hidden');
+                let classDetails = todaysClasses.map(c => `<strong class="text-amber-950">${c.course}</strong> (${c.time} di ${c.room})`).join(', ');
+                reminderText.innerHTML = `Hari ini hari <strong>${todayName}</strong>. Jadwal perkuliahan: ${classDetails}. Persiapkan diri dan kelengkapan tugasmu!`;
+            } else {
+                reminderBanner.classList.add('hidden');
+            }
+        }
+
         function renderStudents() {
             let grid = document.getElementById('studentsGrid');
             document.getElementById('studentCountText').innerText = cachedStudents.length;
@@ -541,7 +613,6 @@
                         </div>
                         ${isAdmin ? `<button onclick="window.openEditModal('${s.id}')" class="text-indigo-600 p-2 hover:bg-indigo-50 rounded"><i class="fa-solid fa-pen"></i></button>` : ''}
                     </div>
-                    <!-- KOLOM REKAP HARIAN MAHASISWA -->
                     <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
                         <span class="text-slate-400 font-medium text-[11px]">Rekap Harian:</span>
                         <span class="px-2 py-0.5 text-[10px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance || 'Hadir'}</span>
@@ -591,6 +662,7 @@
             closeScheduleModal();
             renderSchedule();
             updateCourseFilterOptions();
+            checkScheduleReminder();
 
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
@@ -600,6 +672,7 @@
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
                 updateCourseFilterOptions();
+                checkScheduleReminder();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -629,7 +702,6 @@
             `).join('');
         }
 
-        // LOGIKA BARU: REKAP KEHADIRAN PER MATA KULIAH
         function updateCourseFilterOptions() {
             const filterSelect = document.getElementById('courseFilterSelect');
             const courses = Array.from(new Set(cachedSchedule.map(s => s.course)));
@@ -647,7 +719,6 @@
                 let izinSakit = 0;
                 let alpa = 0;
 
-                // Hitung simulasi/penyesuaian berdasarkan status kehadiran hari ini
                 if (s.attendance === 'Izin' || s.attendance === 'Sakit') {
                     izinSakit = 1;
                     hadir -= 1;
@@ -698,6 +769,7 @@
                 renderAttendance();
                 renderStudents();
                 renderCourseAttendance();
+                updateAbsentSummaryWidget();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -707,12 +779,12 @@
             renderAttendance();
             renderStudents();
             renderCourseAttendance();
+            updateAbsentSummaryWidget();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
-        // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
@@ -891,6 +963,7 @@
             renderStudents();
             renderAttendance();
             renderCourseAttendance();
+            updateAbsentSummaryWidget();
 
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
