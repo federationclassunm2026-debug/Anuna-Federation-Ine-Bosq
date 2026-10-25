@@ -81,7 +81,6 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
-            <!-- WIDGET RINGKASAN & DAFTAR TIDAK HADIR HARI INI -->
             <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <span class="bg-indigo-700 text-amber-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Status Harian Kelas</span>
@@ -250,7 +249,7 @@
             </div>
         </section>
 
-        <!-- TAB 7 BARU: FEDERATION CURHAT -->
+        <!-- TAB 7: FEDERATION CURHAT -->
         <section id="tabContent-curhat" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -502,18 +501,14 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
-        const defaultAssignments = [
-            { id: '1', course: 'Literasi Sains, Teknologi & Seni', title: 'Tugas 1 - LSTS Kelas F', deadlineDate: '2026-10-28', desc: 'Dikumpulkan dalam format Word/PDF via Google Form / Portal Kelas.' }
-        ];
+        // Default dikosongkan sesuai permintaan
+        const defaultAssignments = [];
+        const defaultMemories = [];
 
         const defaultSchedule = [
             { id: '1', day: 'Senin', time: '08:00 - 10:30 WITA', course: 'Akuntansi Keuangan II', room: 'Ruang 302' },
             { id: '2', day: 'Rabu', time: '10:30 - 13:00 WITA', course: 'Auditing 1', room: 'Lab Komputer' },
             { id: '3', day: 'Kamis', time: '13:30 - 16:00 WITA', course: 'Literasi Sains, Teknologi & Seni', room: 'Ruang 302' }
-        ];
-
-        const defaultMemories = [
-            { id: '1', title: 'Pertemuan Perdana Kelas F', desc: 'Keseruan hari pertama perkuliahan S1 Akuntansi Kelas F 2026.', photo: defaultAvatarPhoto }
         ];
 
         const defaultCurhats = [
@@ -656,7 +651,6 @@
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedAssignments = defaultAssignments;
-                    for (let a of defaultAssignments) { await setDoc(doc(db, "assignments_v7_kelasF", a.id), a); }
                 }
 
                 const memSnap = await getDocs(collection(db, "memories_v7_kelasF"));
@@ -664,7 +658,6 @@
                     cachedMemories = memSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 } else {
                     cachedMemories = defaultMemories;
-                    for (let m of defaultMemories) { await setDoc(doc(db, "memories_v7_kelasF", m.id), m); }
                 }
 
                 const curhatSnap = await getDocs(collection(db, "curhat_v7_kelasF"));
@@ -990,7 +983,6 @@
             `).join('');
         }
 
-        // FUNGSI RENDER FEDERATION CURHAT
         function renderCurhats() {
             let container = document.getElementById('curhatGrid');
             if (cachedCurhats.length === 0) {
