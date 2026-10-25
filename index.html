@@ -69,6 +69,29 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
+            <!-- PENGINGAT KULIAH HARI INI DI DIREKTORI -->
+            <div id="todayScheduleAlert" class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
+                    <div class="w-full">
+                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitle">Pengingat Jadwal Kuliah Hari Ini</h4>
+                        <div id="todayScheduleList" class="text-xs space-y-1 text-indigo-800">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOTAK RINGKASAN KETIDAKHADIRAN -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+                <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center">
+                    <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> Rekap Ketidakhadiran Hari Ini
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs" id="absenceSummaryBox">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
@@ -85,6 +108,19 @@
 
         <!-- TAB 2: JADWAL KULIAH -->
         <section id="tabContent-schedule" class="tab-content hidden">
+            <!-- PENGINGAT KULIAH HARI INI DI TAB JADWAL -->
+            <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
+                    <div class="w-full">
+                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitleSchedule">Pengingat Jadwal Kuliah Hari Ini</h4>
+                        <div id="todayScheduleListSchedule" class="text-xs space-y-1 text-indigo-800">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -336,7 +372,6 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
-        // Kosongkan defaultAssignments agar tidak ada tugas LSTS bawaan
         const defaultAssignments = [];
 
         const defaultSchedule = [
@@ -436,7 +471,6 @@
             loadCloudData();
         });
 
-        // KOLEKSI v7 UNTUK MEMASTIKAN POPULASI Ulang PERBAIKAN 41 MAHASISWA
         async function loadCloudData() {
             try {
                 const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
@@ -476,10 +510,78 @@
 
         function renderAll() {
             renderStudents();
+            renderAbsenceSummary();
             renderSchedule();
+            checkTodayScheduleReminder();
             renderAttendance();
             renderAssignments();
             checkDeadlineAlerts();
+        }
+
+        // PENGINGAT KULIAH HARI INI
+        function checkTodayScheduleReminder() {
+            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayName = daysMap[new Date().getDay()];
+
+            const todayClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            
+            // Render ke Direktori Mahasiswa & Jadwal Kuliah
+            ['todayScheduleList', 'todayScheduleListSchedule'].forEach(id => {
+                const listContainer = document.getElementById(id);
+                if (listContainer) {
+                    if (todayClasses.length > 0) {
+                        listContainer.innerHTML = todayClasses.map(c => `
+                            <div class="flex items-center justify-between bg-white/80 p-2 rounded border border-indigo-100 my-1">
+                                <span><strong>${c.course}</strong> (${c.time})</span>
+                                <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        listContainer.innerHTML = `<p class="italic text-indigo-700">Tidak ada jadwal kuliah terjadwal untuk hari ini (${todayName}). Selamat beristirahat!</p>`;
+                    }
+                }
+            });
+
+            ['todayAlertTitle', 'todayAlertTitleSchedule'].forEach(id => {
+                const titleEl = document.getElementById(id);
+                if (titleEl) {
+                    titleEl.innerText = `📅 Pengingat Kuliah Hari Ini (${todayName}):`;
+                }
+            });
+        }
+
+        // RINGKASAN & NAMA KETIDAKHADIRAN
+        function renderAbsenceSummary() {
+            const container = document.getElementById('absenceSummaryBox');
+            if (!container) return;
+
+            const izinList = cachedStudents.filter(s => s.attendance === 'Izin');
+            const sakitList = cachedStudents.filter(s => s.attendance === 'Sakit');
+            const alpaList = cachedStudents.filter(s => s.attendance === 'Alpa');
+
+            container.innerHTML = `
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                    <div class="font-bold text-amber-900 mb-1 flex justify-between items-center">
+                        <span>Izin</span>
+                        <span class="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full text-[11px]">${izinList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${izinList.length > 0 ? izinList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                    <div class="font-bold text-blue-900 mb-1 flex justify-between items-center">
+                        <span>Sakit</span>
+                        <span class="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full text-[11px]">${sakitList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${sakitList.length > 0 ? sakitList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-lg">
+                    <div class="font-bold text-rose-900 mb-1 flex justify-between items-center">
+                        <span>Alpa</span>
+                        <span class="bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full text-[11px]">${alpaList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${alpaList.length > 0 ? alpaList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+            `;
         }
 
         function renderStudents() {
@@ -538,6 +640,7 @@
             cachedSchedule.push(item);
             closeScheduleModal();
             renderSchedule();
+            checkTodayScheduleReminder();
 
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
@@ -546,6 +649,7 @@
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
+                checkTodayScheduleReminder();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -590,6 +694,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
+                renderAbsenceSummary();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -597,12 +702,12 @@
         window.setBulkAttendance = async function(val) {
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
+            renderAbsenceSummary();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
-        // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
@@ -780,6 +885,7 @@
             closeModal();
             renderStudents();
             renderAttendance();
+            renderAbsenceSummary();
 
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
