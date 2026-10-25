@@ -60,10 +60,6 @@
                 <i class="fa-solid fa-clipboard-user"></i>
                 <span>Absensi Kelas</span>
             </button>
-            <button onclick="switchTab('summary')" id="tabBtn-summary" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>Rekap Kehadiran</span>
-            </button>
             <button onclick="switchTab('assignments')" id="tabBtn-assignments" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0 relative">
                 <i class="fa-solid fa-bullhorn"></i>
                 <span>Pengumuman & Tugas</span>
@@ -73,6 +69,29 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
+            <!-- PENGINGAT KULIAH HARI INI DI DIREKTORI -->
+            <div id="todayScheduleAlert" class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
+                    <div class="w-full">
+                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitle">Pengingat Jadwal Kuliah Hari Ini</h4>
+                        <div id="todayScheduleList" class="text-xs space-y-1 text-indigo-800">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KOTAK RINGKASAN KETIDAKHADIRAN -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6">
+                <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center">
+                    <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> Rekap Ketidakhadiran Hari Ini
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs" id="absenceSummaryBox">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Direktori Mahasiswa Kelas F (<span id="studentCountText">0</span> Anggota)</h2>
@@ -89,6 +108,19 @@
 
         <!-- TAB 2: JADWAL KULIAH -->
         <section id="tabContent-schedule" class="tab-content hidden">
+            <!-- PENGINGAT KULIAH HARI INI DI TAB JADWAL -->
+            <div class="bg-indigo-50 border border-indigo-200 text-indigo-900 p-4 rounded-xl mb-6 shadow-sm">
+                <div class="flex items-start space-x-3">
+                    <div class="p-2 bg-indigo-600 text-white rounded-lg mt-0.5"><i class="fa-solid fa-bell text-sm"></i></div>
+                    <div class="w-full">
+                        <h4 class="font-bold text-sm text-indigo-950 mb-1" id="todayAlertTitleSchedule">Pengingat Jadwal Kuliah Hari Ini</h4>
+                        <div id="todayScheduleListSchedule" class="text-xs space-y-1 text-indigo-800">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
                 <div class="flex items-center justify-between mb-4 border-b pb-4">
                     <div>
@@ -137,58 +169,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: REKAP KEHADIRAN & KETIDAKHADIRAN -->
-        <section id="tabContent-summary" class="tab-content hidden">
-            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6">
-                <h2 class="text-xl font-bold text-slate-800 mb-1">Rekap Statistik Kehadiran Kelas F</h2>
-                <p class="text-xs text-slate-500 mb-6">Akumulasi data kehadiran dan rincian ketidakhadiran seluruh mahasiswa.</p>
-                
-                <!-- KARTU STATISTIK RINGKASAN -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">Hadir</span>
-                        <h3 id="statHadir" class="text-2xl font-black text-emerald-700 mt-1">0</h3>
-                    </div>
-                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-center">
-                        <span class="text-xs font-bold text-amber-600 uppercase">Izin</span>
-                        <h3 id="statIzin" class="text-2xl font-black text-amber-700 mt-1">0</h3>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-center">
-                        <span class="text-xs font-bold text-blue-600 uppercase">Sakit</span>
-                        <h3 id="statSakit" class="text-2xl font-black text-blue-700 mt-1">0</h3>
-                    </div>
-                    <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl text-center">
-                        <span class="text-xs font-bold text-rose-600 uppercase">Alpa</span>
-                        <h3 id="statAlpa" class="text-2xl font-black text-rose-700 mt-1">0</h3>
-                    </div>
-                </div>
-
-                <!-- RINCIAN DAFTAR KETIDAKHADIRAN -->
-                <div class="border-t pt-6">
-                    <h3 class="font-bold text-slate-800 text-base mb-4 flex items-center">
-                        <i class="fa-solid fa-list-check text-indigo-600 mr-2"></i> Rincian Mahasiswa yang Tidak Hadir (Izin / Sakit / Alpa)
-                    </h3>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-xs border-b">
-                                <tr>
-                                    <th class="p-3">No</th>
-                                    <th class="p-3">Nama Mahasiswa</th>
-                                    <th class="p-3">NIM</th>
-                                    <th class="p-3">Jabatan</th>
-                                    <th class="p-3 text-center">Status Ketidakhadiran</th>
-                                </tr>
-                            </thead>
-                            <tbody id="absenceListTableBody" class="divide-y divide-slate-100">
-                                <!-- Rendered dynamically -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
+        <!-- TAB 4: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
             <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
@@ -529,11 +510,78 @@
 
         function renderAll() {
             renderStudents();
+            renderAbsenceSummary();
             renderSchedule();
+            checkTodayScheduleReminder();
             renderAttendance();
-            renderAttendanceSummary();
             renderAssignments();
             checkDeadlineAlerts();
+        }
+
+        // PENGINGAT KULIAH HARI INI
+        function checkTodayScheduleReminder() {
+            const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const todayName = daysMap[new Date().getDay()];
+
+            const todayClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            
+            // Render ke Direktori Mahasiswa & Jadwal Kuliah
+            ['todayScheduleList', 'todayScheduleListSchedule'].forEach(id => {
+                const listContainer = document.getElementById(id);
+                if (listContainer) {
+                    if (todayClasses.length > 0) {
+                        listContainer.innerHTML = todayClasses.map(c => `
+                            <div class="flex items-center justify-between bg-white/80 p-2 rounded border border-indigo-100 my-1">
+                                <span><strong>${c.course}</strong> (${c.time})</span>
+                                <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded"><i class="fa-solid fa-location-dot mr-1"></i>${c.room}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        listContainer.innerHTML = `<p class="italic text-indigo-700">Tidak ada jadwal kuliah terjadwal untuk hari ini (${todayName}). Selamat beristirahat!</p>`;
+                    }
+                }
+            });
+
+            ['todayAlertTitle', 'todayAlertTitleSchedule'].forEach(id => {
+                const titleEl = document.getElementById(id);
+                if (titleEl) {
+                    titleEl.innerText = `📅 Pengingat Kuliah Hari Ini (${todayName}):`;
+                }
+            });
+        }
+
+        // RINGKASAN & NAMA KETIDAKHADIRAN
+        function renderAbsenceSummary() {
+            const container = document.getElementById('absenceSummaryBox');
+            if (!container) return;
+
+            const izinList = cachedStudents.filter(s => s.attendance === 'Izin');
+            const sakitList = cachedStudents.filter(s => s.attendance === 'Sakit');
+            const alpaList = cachedStudents.filter(s => s.attendance === 'Alpa');
+
+            container.innerHTML = `
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                    <div class="font-bold text-amber-900 mb-1 flex justify-between items-center">
+                        <span>Izin</span>
+                        <span class="bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full text-[11px]">${izinList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${izinList.length > 0 ? izinList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                    <div class="font-bold text-blue-900 mb-1 flex justify-between items-center">
+                        <span>Sakit</span>
+                        <span class="bg-blue-200 text-blue-900 px-2 py-0.5 rounded-full text-[11px]">${sakitList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${sakitList.length > 0 ? sakitList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-lg">
+                    <div class="font-bold text-rose-900 mb-1 flex justify-between items-center">
+                        <span>Alpa</span>
+                        <span class="bg-rose-200 text-rose-900 px-2 py-0.5 rounded-full text-[11px]">${alpaList.length} Orang</span>
+                    </div>
+                    <p class="text-slate-600 text-[11px]">${alpaList.length > 0 ? alpaList.map(s => s.name).join(', ') : 'Tidak ada'}</p>
+                </div>
+            `;
         }
 
         function renderStudents() {
@@ -592,6 +640,7 @@
             cachedSchedule.push(item);
             closeScheduleModal();
             renderSchedule();
+            checkTodayScheduleReminder();
 
             await setDoc(doc(db, "schedules_v7_kelasF", item.id), item);
         }
@@ -600,6 +649,7 @@
             if (confirm("Apakah Anda yakin ingin menghapus jadwal ini?")) {
                 cachedSchedule = cachedSchedule.filter(s => s.id !== id);
                 renderSchedule();
+                checkTodayScheduleReminder();
                 await deleteDoc(doc(db, "schedules_v7_kelasF", id));
             }
         }
@@ -629,35 +679,6 @@
             `).join('');
         }
 
-        function renderAttendanceSummary() {
-            const countHadir = cachedStudents.filter(s => !s.attendance || s.attendance === 'Hadir').length;
-            const countIzin = cachedStudents.filter(s => s.attendance === 'Izin').length;
-            const countSakit = cachedStudents.filter(s => s.attendance === 'Sakit').length;
-            const countAlpa = cachedStudents.filter(s => s.attendance === 'Alpa').length;
-
-            document.getElementById('statHadir').innerText = countHadir;
-            document.getElementById('statIzin').innerText = countIzin;
-            document.getElementById('statSakit').innerText = countSakit;
-            document.getElementById('statAlpa').innerText = countAlpa;
-
-            const nonHadirStudents = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
-            const absenceTbody = document.getElementById('absenceListTableBody');
-
-            if (nonHadirStudents.length === 0) {
-                absenceTbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400 text-xs italic">Semua mahasiswa hadir atau belum ada data ketidakhadiran.</td></tr>`;
-            } else {
-                absenceTbody.innerHTML = nonHadirStudents.map((s, idx) => `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 text-xs text-slate-400 font-mono">${idx + 1}</td>
-                        <td class="p-3 font-semibold text-slate-800">${s.name}</td>
-                        <td class="p-3 font-mono text-xs text-slate-500">${s.nim}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-600">${s.role}</span></td>
-                        <td class="p-3 text-center"><span class="px-2.5 py-1 text-xs font-semibold rounded ${getAttendanceClass(s.attendance)}">${s.attendance}</span></td>
-                    </tr>
-                `).join('');
-            }
-        }
-
         function getAttendanceClass(att) {
             switch(att) {
                 case 'Hadir': return 'bg-emerald-100 text-emerald-800';
@@ -673,7 +694,7 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
-                renderAttendanceSummary();
+                renderAbsenceSummary();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -681,13 +702,12 @@
         window.setBulkAttendance = async function(val) {
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
-            renderAttendanceSummary();
+            renderAbsenceSummary();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
 
-        // SYSTEM PENGINGAT DEADLINE
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
@@ -865,7 +885,7 @@
             closeModal();
             renderStudents();
             renderAttendance();
-            renderAttendanceSummary();
+            renderAbsenceSummary();
 
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
