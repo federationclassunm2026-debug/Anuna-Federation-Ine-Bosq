@@ -70,16 +70,16 @@
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
             
-            <!-- WIDGET PENGINGAT MATKUL HARI INI & BESOK -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <!-- GRID WIDGET ATAS: PENGINGAT MATKUL & REKAP TIDAK HADIR -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <!-- WIDGET HARI INI -->
                 <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="bg-amber-800 text-amber-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-bell mr-1"></i> Jadwal Hari Ini</span>
+                            <span class="bg-amber-800 text-amber-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-bell mr-1"></i> Hari Ini</span>
                             <span id="currentDayBadge" class="text-xs font-semibold text-amber-100">-</span>
                         </div>
-                        <p class="text-xs text-amber-100 mt-2 leading-relaxed" id="studentTabTodayText">Memuat jadwal hari ini...</p>
+                        <p class="text-xs text-amber-100 mt-2 leading-relaxed" id="studentTabTodayText">Memuat jadwal...</p>
                     </div>
                 </div>
 
@@ -87,10 +87,24 @@
                 <div class="bg-gradient-to-r from-teal-700 to-teal-800 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="bg-teal-900 text-teal-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-calendar-day mr-1"></i> Jadwal Besok</span>
+                            <span class="bg-teal-900 text-teal-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-calendar-day mr-1"></i> Besok</span>
                             <span id="tomorrowDayBadge" class="text-xs font-semibold text-teal-100">-</span>
                         </div>
-                        <p class="text-xs text-teal-100 mt-2 leading-relaxed" id="studentTabTomorrowText">Memuat jadwal besok...</p>
+                        <p class="text-xs text-teal-100 mt-2 leading-relaxed" id="studentTabTomorrowText">Memuat jadwal...</p>
+                    </div>
+                </div>
+
+                <!-- WIDGET REKAP TIDAK HADIR HARI INI -->
+                <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-5 rounded-2xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="bg-indigo-700 text-amber-300 text-[10px] px-2 py-0.5 rounded font-bold uppercase"><i class="fa-solid fa-user-slash mr-1"></i> Status Kehadiran</span>
+                            <span id="absentCountBadge" class="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">0 Nihil</span>
+                        </div>
+                        <h4 class="text-xs font-bold mt-1 text-indigo-200">Tidak Hadir Hari Ini:</h4>
+                    </div>
+                    <div id="absentNamesContainer" class="mt-2 max-h-16 overflow-y-auto custom-scrollbar text-xs space-y-1">
+                        <span class="text-emerald-400 italic font-medium">✨ Semua hadir.</span>
                     </div>
                 </div>
             </div>
@@ -507,6 +521,27 @@
             renderAssignments();
             checkDeadlineAlerts();
             checkScheduleReminders();
+            updateAbsentSummaryWidget();
+        }
+
+        // FUNGSI WIDGET REKAP KETIDAKHADIRAN HARI INI
+        function updateAbsentSummaryWidget() {
+            const absentList = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
+            const container = document.getElementById('absentNamesContainer');
+            const countBadge = document.getElementById('absentCountBadge');
+
+            countBadge.innerText = `${absentList.length} Nihil`;
+
+            if (absentList.length === 0) {
+                container.innerHTML = `<span class="text-emerald-400 italic font-medium">✨ Semua hadir hari ini.</span>`;
+            } else {
+                container.innerHTML = absentList.map(s => `
+                    <div class="flex items-center justify-between bg-indigo-950 px-2 py-0.5 rounded border border-indigo-700/60">
+                        <span class="font-semibold truncate mr-2">${s.name}</span>
+                        <span class="px-1 py-0.5 text-[8px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance}</span>
+                    </div>
+                `).join('');
+            }
         }
 
         // FUNGSI PENGINGAT JADWAL HARI INI & BESOK
@@ -544,14 +579,20 @@
             let grid = document.getElementById('studentsGrid');
             document.getElementById('studentCountText').innerText = cachedStudents.length;
             grid.innerHTML = cachedStudents.map(s => `
-                <div class="bg-white p-4 rounded-xl border shadow-sm flex items-center space-x-3">
-                    <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
-                    <div class="flex-1 min-w-0">
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
-                        <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
-                        <p class="text-xs font-mono text-slate-500">${s.nim}</p>
+                <div class="bg-white p-4 rounded-xl border shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <img src="${s.photo || defaultAvatarPhoto}" class="w-12 h-12 rounded-full object-cover border">
+                        <div class="flex-1 min-w-0">
+                            <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-600 rounded">${s.role}</span>
+                            <h4 class="font-bold text-sm truncate mt-0.5">${s.name}</h4>
+                            <p class="text-xs font-mono text-slate-500">${s.nim}</p>
+                        </div>
+                        ${isAdmin ? `<button onclick="window.openEditModal('${s.id}')" class="text-indigo-600 p-2 hover:bg-indigo-50 rounded"><i class="fa-solid fa-pen"></i></button>` : ''}
                     </div>
-                    ${isAdmin ? `<button onclick="window.openEditModal('${s.id}')" class="text-indigo-600 p-2 hover:bg-indigo-50 rounded"><i class="fa-solid fa-pen"></i></button>` : ''}
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-slate-400 font-medium text-[11px]">Rekap Harian:</span>
+                        <span class="px-2 py-0.5 text-[10px] font-bold rounded ${getAttendanceClass(s.attendance)}">${s.attendance || 'Hadir'}</span>
+                    </div>
                 </div>
             `).join('');
         }
@@ -650,6 +691,8 @@
             if (s) {
                 s.attendance = val;
                 renderAttendance();
+                renderStudents();
+                updateAbsentSummaryWidget();
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
         }
@@ -657,6 +700,8 @@
         window.setBulkAttendance = async function(val) {
             cachedStudents.forEach(s => s.attendance = val);
             renderAttendance();
+            renderStudents();
+            updateAbsentSummaryWidget();
             for (let s of cachedStudents) {
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
             }
@@ -815,7 +860,7 @@
 
         window.saveStudentData = async function() {
             let id = document.getElementById('editId').value;
-            let name = document.getElementById('editName').value;
+            let name = document.getElementById('editName' ).value;
             let nim = document.getElementById('editNim').value;
             let role = document.getElementById('editRole').value;
 
@@ -839,6 +884,7 @@
             closeModal();
             renderStudents();
             renderAttendance();
+            updateAbsentSummaryWidget();
 
             await setDoc(doc(db, "students_v7_kelasF", s.id), s);
         }
