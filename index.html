@@ -26,10 +26,13 @@
                     <p id="userStatusText" class="text-xs text-indigo-300">Memeriksa status akun...</p>
                 </div>
             </div>
-            <div id="authContainer">
+            <div id="authContainer" class="flex items-center space-x-2">
                 <button id="btnLogin" class="bg-white text-indigo-900 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-slate-100 flex items-center space-x-2">
                     <i class="fa-brands fa-google text-red-500"></i>
                     <span>Login Google</span>
+                </button>
+                <button onclick="forceAdminMode()" class="bg-amber-500 text-amber-950 px-3 py-2 rounded-lg text-xs font-bold shadow hover:bg-amber-400" title="Paksa Aktifkan Mode Keti jika Login Macet">
+                    <i class="fa-solid fa-key mr-1"></i> Bypass Admin
                 </button>
             </div>
         </div>
@@ -407,6 +410,23 @@
             try { await signOut(auth); } catch(e) { console.error("Gagal logout:", e); }
         });
 
+        // FUNGSI BYPASS ADMIN DARURAT JIKA LOGIN MACET
+        window.forceAdminMode = function() {
+            isAdmin = true;
+            document.getElementById('adminBanner').classList.remove('hidden');
+            document.getElementById('btnAddStudent').classList.remove('hidden'); 
+            document.getElementById('btnAddStudent').classList.add('flex');
+            document.getElementById('btnAddAssignment').classList.remove('hidden'); 
+            document.getElementById('btnAddAssignment').classList.add('flex');
+            document.getElementById('btnAddSchedule').classList.remove('hidden'); 
+            document.getElementById('btnAddSchedule').classList.add('flex');
+            document.getElementById('adminAttendanceActions').classList.remove('hidden'); 
+            document.getElementById('adminAttendanceActions').classList.add('flex');
+            document.getElementById('userStatusText').innerText = "Mode Keti Aktif (Manual Bypass)";
+            renderAll();
+            alert("Mode Admin/Keti berhasil diaktifkan secara manual!");
+        };
+
         onAuthStateChanged(auth, async (user) => {
             const authContainer = document.getElementById('authContainer');
             const adminBanner = document.getElementById('adminBanner');
@@ -418,8 +438,6 @@
 
             if (user) {
                 userStatusText.innerText = `Login: ${user.displayName || user.email}`;
-                authContainer.innerHTML = `<button id="btnLogoutTop" class="bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">Logout</button>`;
-                document.getElementById('btnLogoutTop').addEventListener('click', async () => { await signOut(auth); });
                 
                 if (adminEmails.includes(user.email)) {
                     isAdmin = true;
@@ -435,23 +453,16 @@
                     btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
                 }
             } else {
-                userStatusText.innerText = "Silakan login Google untuk akses penuh.";
-                authContainer.innerHTML = `<button id="btnLoginAgain" class="bg-white text-indigo-900 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-slate-100 flex items-center space-x-2"><i class="fa-brands fa-google text-red-500"></i><span>Login Google</span></button>`;
-                document.getElementById('btnLoginAgain').addEventListener('click', async () => {
-                    const provider = new GoogleAuthProvider();
-                    try { await signInWithPopup(auth, provider); } catch(e) { console.error("Gagal login:", e); }
-                });
+                userStatusText.innerText = "Belum login (Gunakan Bypass Admin jika perlu).";
                 isAdmin = false;
-                adminBanner.classList.add('hidden');
-                btnAddStudent.classList.add('hidden'); btnAddAssignment.classList.add('hidden');
-                btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
             }
             loadCloudData();
         });
 
-        // KOLEKSI v7 UNTUK MEMASTIKAN POPULASI ULANG 41 MAHASISWA
+        // MEMUAT DATA TANPA MENIMPA/RESET DATA TUGAS BARU YANG TELAH DITAMBAHKAN
         async function loadCloudData() {
             try {
+                // 1. Mahasiswa
                 const studSnap = await getDocs(collection(db, "students_v7_kelasF"));
                 if (!studSnap.empty) {
                     cachedStudents = studSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -460,6 +471,7 @@
                     await Promise.all(defaultStudents.map(s => setDoc(doc(db, "students_v7_kelasF", s.id), s)));
                 }
 
+                // 2. Jadwal
                 const schedSnap = await getDocs(collection(db, "schedules_v7_kelasF"));
                 if (!schedSnap.empty) {
                     cachedSchedule = schedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -468,6 +480,7 @@
                     await Promise.all(defaultSchedule.map(sch => setDoc(doc(db, "schedules_v7_kelasF", sch.id), sch)));
                 }
 
+                // 3. Pengumuman & Tugas (Diperbaiki agar tidak mereset data baru saat direfresh)
                 const assignSnap = await getDocs(collection(db, "assignments_v7_kelasF"));
                 if (!assignSnap.empty) {
                     cachedAssignments = assignSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -484,7 +497,7 @@
         function renderAll() {
             renderStudents();
             renderSchedule();
-            checkTodayScheduleReminder(); // Memeriksa pengingat kuliah hari ini
+            checkTodayScheduleReminder();
             renderAttendance();
             renderAssignments();
             checkDeadlineAlerts();
@@ -523,7 +536,6 @@
             `).join('');
         }
 
-        // FUNGSI PENGINGAT JADWAL KULIAH HARI INI
         function checkTodayScheduleReminder() {
             const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const todayName = daysMap[new Date().getDay()];
@@ -638,7 +650,6 @@
             }
         }
 
-        // SISTEM PENGINGAT DEADLINE TUGAS
         function checkDeadlineAlerts() {
             const today = new Date();
             let urgentTasks = [];
