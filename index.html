@@ -81,19 +81,32 @@
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
-            <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                    <span class="bg-indigo-700 text-amber-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Status Harian Kelas</span>
-                    <h3 class="text-lg font-bold mt-2">Rekap Ketidakhadiran Hari Ini</h3>
-                    <p class="text-xs text-indigo-200 mt-1" id="absentSummaryText">Memuat data ketidakhadiran...</p>
-                </div>
-                <div class="bg-indigo-950/60 p-4 rounded-xl border border-indigo-700/50 w-full md:w-auto min-w-[280px]">
-                    <div class="text-xs font-semibold text-indigo-300 mb-2 flex items-center justify-between">
-                        <span><i class="fa-solid fa-user-xmark mr-1.5 text-rose-400"></i> Daftar Mahasiswa Tidak Hadir:</span>
-                        <span id="absentCountBadge" class="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">0 Nihil</span>
+            
+            <!-- GRID WIDGET ATAS: PENGINGAT MATKUL & REKAP KETIDAKHADIRAN -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <!-- WIDGET PENGINGAT MATKUL HARI INI -->
+                <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="bg-amber-800 text-amber-200 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"><i class="fa-solid fa-bell mr-1"></i> Jadwal Hari Ini</span>
+                            <span id="currentDayBadge" class="text-xs font-semibold text-amber-100">Memeriksa hari...</span>
+                        </div>
+                        <h3 class="text-base font-bold mt-1">Pengingat Mata Kuliah</h3>
+                        <p class="text-xs text-amber-100 mt-1 leading-relaxed" id="studentTabReminderText">Memeriksa jadwal kuliah...</p>
                     </div>
-                    <div id="absentNamesContainer" class="max-h-24 overflow-y-auto custom-scrollbar text-xs space-y-1">
-                        <span class="text-emerald-400 italic font-medium">Semua mahasiswa hadir hari ini.</span>
+                </div>
+
+                <!-- WIDGET REKAP KETIDAKHADIRAN -->
+                <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md flex flex-col justify-between">
+                    <div>
+                        <span class="bg-indigo-700 text-amber-300 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Status Harian Kelas</span>
+                        <div class="flex items-center justify-between mt-2">
+                            <h3 class="text-base font-bold">Rekap Ketidakhadiran</h3>
+                            <span id="absentCountBadge" class="bg-rose-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">0 Nihil</span>
+                        </div>
+                    </div>
+                    <div id="absentNamesContainer" class="mt-2 max-h-20 overflow-y-auto custom-scrollbar text-xs space-y-1">
+                        <span class="text-emerald-400 italic font-medium">✨ Semua mahasiswa hadir hari ini.</span>
                     </div>
                 </div>
             </div>
@@ -501,7 +514,6 @@
             { id: "41", nim: "260901502073", name: "ANDI AMELIA NUR ASYIFA", role: "Anggota", attendance: "Hadir", photo: defaultAvatarPhoto }
         ];
 
-        // Default dikosongkan sesuai permintaan
         const defaultAssignments = [];
         const defaultMemories = [];
 
@@ -691,10 +703,8 @@
             const absentList = cachedStudents.filter(s => s.attendance && s.attendance !== 'Hadir');
             const container = document.getElementById('absentNamesContainer');
             const countBadge = document.getElementById('absentCountBadge');
-            const summaryText = document.getElementById('absentSummaryText');
 
             countBadge.innerText = `${absentList.length} Mahasiswa`;
-            summaryText.innerText = `Dari total ${cachedStudents.length} anggota, terdapat ${absentList.length} mahasiswa yang berstatus Tidak Hadir (Izin/Sakit/Alpa) hari ini.`;
 
             if (absentList.length === 0) {
                 container.innerHTML = `<span class="text-emerald-400 italic font-medium">✨ Semua mahasiswa tercatat hadir hari ini.</span>`;
@@ -710,17 +720,30 @@
 
         function checkScheduleReminder() {
             const daysMap = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const todayName = daysMap[new Date().getDay()];
+            const todayIndex = new Date().getDay();
+            const todayName = daysMap[todayIndex];
+            
+            document.getElementById('currentDayBadge').innerText = todayName;
+
             const todaysClasses = cachedSchedule.filter(s => s.day.toLowerCase() === todayName.toLowerCase());
+            
+            // Banner di tab jadwal
             const reminderText = document.getElementById('scheduleReminderText');
             const reminderBanner = document.getElementById('scheduleReminderBanner');
+            
+            // Text widget di direktori mahasiswa
+            const studentTabReminderText = document.getElementById('studentTabReminderText');
 
             if (todaysClasses.length > 0) {
                 reminderBanner.classList.remove('hidden');
                 let classDetails = todaysClasses.map(c => `<strong class="text-amber-950">${c.course}</strong> (${c.time} di ${c.room})`).join(', ');
                 reminderText.innerHTML = `Hari ini hari <strong>${todayName}</strong>. Jadwal perkuliahan: ${classDetails}. Persiapkan diri dan kelengkapan tugasmu!`;
+                
+                let studentDetails = todaysClasses.map(c => `• ${c.course} (${c.time} - ${c.room})`).join('<br>');
+                studentTabReminderText.innerHTML = studentDetails;
             } else {
                 reminderBanner.classList.add('hidden');
+                studentTabReminderText.innerHTML = `Tidak ada jadwal perkuliahan terjadwal untuk hari <strong>${todayName}</strong>.`;
             }
         }
 
