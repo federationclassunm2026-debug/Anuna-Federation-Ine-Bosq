@@ -73,11 +73,14 @@
                 <i class="fa-solid fa-images text-amber-500"></i>
                 <span>Kenangan Federation</span>
             </button>
+            <button onclick="switchTab('curhat')" id="tabBtn-curhat" class="tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700 flex items-center space-x-2 shrink-0">
+                <i class="fa-solid fa-comments text-rose-500"></i>
+                <span>Federation Curhat</span>
+            </button>
         </div>
 
         <!-- TAB 1: DIREKTORI MAHASISWA -->
         <section id="tabContent-students" class="tab-content block">
-            
             <!-- WIDGET RINGKASAN & DAFTAR TIDAK HADIR HARI INI -->
             <div class="bg-gradient-to-r from-indigo-900 to-indigo-800 text-white p-6 rounded-2xl shadow-md mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
@@ -112,8 +115,6 @@
 
         <!-- TAB 2: JADWAL KULIAH & PENGINGAT MATKUL -->
         <section id="tabContent-schedule" class="tab-content hidden">
-            
-            <!-- WIDGET PENGINGAT MATAKULIAH HARI INI -->
             <div id="scheduleReminderBanner" class="bg-amber-50 border border-amber-200 p-5 rounded-2xl mb-6 shadow-sm flex items-start space-x-3">
                 <div class="p-2.5 bg-amber-500 text-white rounded-xl shadow">
                     <i class="fa-solid fa-bell text-base animate-bounce"></i>
@@ -211,7 +212,6 @@
 
         <!-- TAB 5: PENGUMUMAN & TUGAS PERKULIAHAN -->
         <section id="tabContent-assignments" class="tab-content hidden">
-            <!-- DEADLINE ALERT BANNER -->
             <div id="deadlineAlertContainer" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-xl mb-6 flex items-start space-x-3 shadow-sm">
                 <i class="fa-solid fa-triangle-exclamation text-rose-500 text-lg mt-0.5"></i>
                 <div class="text-xs">
@@ -234,19 +234,34 @@
             </div>
         </section>
 
-        <!-- TAB 6: KENANGAN FEDERATION (TERBUKA UNTUK SEMUA MAHASISWA) -->
+        <!-- TAB 6: KENANGAN FEDERATION -->
         <section id="tabContent-memories" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Kenangan Federation S1 Akuntansi F</h2>
                     <p class="text-xs text-slate-500">Dokumentasi momen kebersamaan, kegiatan kampus, dan galeri kelas.</p>
                 </div>
-                <!-- Tombol unggah kini aktif untuk semua mahasiswa -->
                 <button onclick="openAddMemoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
                     <i class="fa-solid fa-camera"></i><span>Unggah Kenangan</span>
                 </button>
             </div>
             <div id="memoriesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 7 BARU: FEDERATION CURHAT -->
+        <section id="tabContent-curhat" class="tab-content hidden">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Federation Curhat & Aspirasi</h2>
+                    <p class="text-xs text-slate-500">Ruang bebas berekspresi untuk seluruh mahasiswa Kelas F. Pilih tampilkan nama atau anonim.</p>
+                </div>
+                <button onclick="openAddCurhatModal()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 shadow">
+                    <i class="fa-solid fa-heart-pulse"></i><span>Tulis Curhatan</span>
+                </button>
+            </div>
+            <div id="curhatGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Rendered dynamically -->
             </div>
         </section>
@@ -374,6 +389,36 @@
         </div>
     </div>
 
+    <!-- MODAL TULIS CURHATAN FEDERATION -->
+    <div id="curhatModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="font-bold text-lg text-rose-700 flex items-center gap-2"><i class="fa-solid fa-heart-pulse"></i> Federation Curhat</h3>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Mode Identitas</label>
+                <select id="curhatMode" onchange="toggleCurhatAuthorInput()" class="w-full px-3 py-2 border rounded-lg text-sm font-semibold bg-slate-50">
+                    <option value="Anonymous">🕶️ Kirim Secara Anonim (Tanpa Nama)</option>
+                    <option value="Public">👤 Kirim Dengan Nama Mahasiswa</option>
+                </select>
+            </div>
+            <div id="curhatAuthorBox" class="hidden">
+                <label class="block text-xs font-semibold mb-1">Nama Pengirim</label>
+                <input type="text" id="curhatAuthorName" placeholder="Tuliskan nama Anda..." class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Judul / Topik Curhatan</label>
+                <input type="text" id="curhatTitle" placeholder="Contoh: Tugas bertubi-tubi minggu ini..." class="w-full px-3 py-2 border rounded-lg text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold mb-1">Isi Curhatan / Ungkapan Perasaan</label>
+                <textarea id="curhatMessage" rows="4" placeholder="Tumpahkan perasaan atau saranmu di sini secara santun..." class="w-full px-3 py-2 border rounded-lg text-sm"></textarea>
+            </div>
+            <div class="flex justify-end space-x-2 pt-4">
+                <button type="button" onclick="closeCurhatModal()" class="px-4 py-2 border rounded-lg text-sm">Batal</button>
+                <button type="button" onclick="saveCurhatData()" class="px-4 py-2 bg-rose-600 text-white rounded-lg text-sm font-semibold">Kirim Curhatan</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FIREBASE SDK & LOGIKA UTAMA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -404,7 +449,9 @@
         let cachedAssignments = [];
         let cachedSchedule = [];
         let cachedMemories = [];
+        let cachedCurhats = [];
         let isAdmin = false;
+        let currentUserDisplayName = "";
         let tempPhoto = "";
         let tempMemoryPhoto = "";
 
@@ -467,6 +514,10 @@
 
         const defaultMemories = [
             { id: '1', title: 'Pertemuan Perdana Kelas F', desc: 'Keseruan hari pertama perkuliahan S1 Akuntansi Kelas F 2026.', photo: defaultAvatarPhoto }
+        ];
+
+        const defaultCurhats = [
+            { id: '1', author: 'Anonim Federation', isAnon: true, title: 'Semangat Perkuliahan!', message: 'Semoga perkuliahan semester ini lancar dan nilai seluruh mahasiswa Kelas F memuaskan!', date: '2026-10-25' }
         ];
 
         // AUTO COMPRESSOR UNTUK FOTO UPLOAD MAHASISWA
@@ -548,7 +599,8 @@
             const userStatusText = document.getElementById('userStatusText');
 
             if (user) {
-                userStatusText.innerText = `Login: ${user.displayName || user.email}`;
+                currentUserDisplayName = user.displayName || user.email.split('@')[0];
+                userStatusText.innerText = `Login: ${currentUserDisplayName}`;
                 authContainer.innerHTML = `<button id="btnLogoutTop" class="bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">Logout</button>`;
                 document.getElementById('btnLogoutTop').addEventListener('click', async () => { await signOut(auth); });
                 
@@ -566,6 +618,7 @@
                     btnAddSchedule.classList.add('hidden'); adminAttendanceActions.classList.add('hidden');
                 }
             } else {
+                currentUserDisplayName = "";
                 userStatusText.innerText = "Silakan login Google untuk akses penuh.";
                 authContainer.innerHTML = `<button id="btnLoginAgain" class="bg-white text-indigo-900 px-3 sm:px-4 py-2 rounded-lg text-xs font-bold shadow hover:bg-slate-100 flex items-center space-x-2"><i class="fa-brands fa-google text-red-500"></i><span>Login Google</span></button>`;
                 document.getElementById('btnLoginAgain').addEventListener('click', async () => {
@@ -613,6 +666,14 @@
                     cachedMemories = defaultMemories;
                     for (let m of defaultMemories) { await setDoc(doc(db, "memories_v7_kelasF", m.id), m); }
                 }
+
+                const curhatSnap = await getDocs(collection(db, "curhat_v7_kelasF"));
+                if (!curhatSnap.empty) {
+                    cachedCurhats = curhatSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else {
+                    cachedCurhats = defaultCurhats;
+                    for (let c of defaultCurhats) { await setDoc(doc(db, "curhat_v7_kelasF", c.id), c); }
+                }
             } catch (err) {
                 console.error("Error loading cloud data:", err);
             }
@@ -627,6 +688,7 @@
             renderCourseAttendance();
             renderAssignments();
             renderMemories();
+            renderCurhats();
             checkDeadlineAlerts();
             updateAbsentSummaryWidget();
             checkScheduleReminder();
@@ -904,7 +966,6 @@
             }).join('');
         }
 
-        // FUNGSI RENDER KENANGAN (Tombol hapus kini tersedia untuk semua mahasiswa)
         function renderMemories() {
             let container = document.getElementById('memoriesGrid');
             if (cachedMemories.length === 0) {
@@ -927,6 +988,98 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // FUNGSI RENDER FEDERATION CURHAT
+        function renderCurhats() {
+            let container = document.getElementById('curhatGrid');
+            if (cachedCurhats.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center py-8 text-slate-400 text-sm">Belum ada curhatan. Jadilah yang pertama menyampaikan ucapan atau keluh kesah!</p>`;
+                return;
+            }
+            container.innerHTML = cachedCurhats.map(c => `
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-rose-100 to-transparent rounded-bl-full pointer-events-none"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${c.isAnon ? 'bg-slate-800 text-slate-200' : 'bg-rose-100 text-rose-700'}">
+                                ${c.isAnon ? '🕶️ Anonim' : '👤 ' + c.author}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">${c.date || ''}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-2">${c.title}</h4>
+                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${c.message}</p>
+                    </div>
+                    ${isAdmin ? `
+                        <div class="mt-4 pt-2 border-t border-slate-100 flex justify-end">
+                            <button onclick="window.deleteCurhat('${c.id}')" class="text-rose-600 text-xs font-semibold hover:underline">
+                                <i class="fa-solid fa-trash mr-1"></i>Hapus
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        window.toggleCurhatAuthorInput = function() {
+            const mode = document.getElementById('curhatMode').value;
+            const authorBox = document.getElementById('curhatAuthorBox');
+            if (mode === 'Public') {
+                authorBox.classList.remove('hidden');
+                if (currentUserDisplayName && !document.getElementById('curhatAuthorName').value) {
+                    document.getElementById('curhatAuthorName').value = currentUserDisplayName;
+                }
+            } else {
+                authorBox.classList.add('hidden');
+            }
+        }
+
+        window.openAddCurhatModal = function() {
+            document.getElementById('curhatMode').value = "Anonymous";
+            document.getElementById('curhatAuthorName').value = currentUserDisplayName || "";
+            document.getElementById('curhatTitle').value = "";
+            document.getElementById('curhatMessage').value = "";
+            toggleCurhatAuthorInput();
+            document.getElementById('curhatModal').classList.remove('hidden');
+        }
+
+        window.closeCurhatModal = function() { document.getElementById('curhatModal').classList.add('hidden'); }
+
+        window.saveCurhatData = async function() {
+            const mode = document.getElementById('curhatMode').value;
+            const title = document.getElementById('curhatTitle').value;
+            const message = document.getElementById('curhatMessage').value;
+            let authorName = document.getElementById('curhatAuthorName').value;
+
+            if (!title || !message) return alert("Judul dan isi curhatan wajib diisi!");
+
+            const isAnon = mode === 'Anonymous';
+            if (!isAnon && !authorName) {
+                authorName = currentUserDisplayName || "Mahasiswa Kelas F";
+            }
+
+            const item = {
+                id: Date.now().toString(),
+                author: isAnon ? "Anonim Federation" : authorName,
+                isAnon,
+                title,
+                message,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            cachedCurhats.unshift(item);
+            closeCurhatModal();
+            renderCurhats();
+
+            await setDoc(doc(db, "curhat_v7_kelasF", item.id), item);
+        }
+
+        window.deleteCurhat = async function(id) {
+            if (confirm("Hapus curhatan ini?")) {
+                cachedCurhats = cachedCurhats.filter(c => c.id !== id);
+                renderCurhats();
+                await deleteDoc(doc(db, "curhat_v7_kelasF", id));
+            }
         }
 
         window.openAddMemoryModal = function() {
