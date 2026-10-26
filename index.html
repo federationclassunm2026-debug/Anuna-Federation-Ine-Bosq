@@ -203,7 +203,7 @@
             </div>
         </section>
 
-        <!-- TAB 4: REKAP PER MATKUL (TANPA BAGAN HADIR & PERSENTASE) -->
+        <!-- TAB 4: REKAP PER MATKUL -->
         <section id="tabContent-course-attendance" class="tab-content hidden">
             <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                 <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 border-b pb-4">
@@ -294,22 +294,26 @@
 
     </main>
 
-    <!-- MODAL FORM IZIN MANDIRI MAHASISWA -->
+    <!-- MODAL FORM IZIN MANDIRI MAHASISWA & PEMBATALAN -->
     <div id="studentPermitModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between border-b pb-3">
-                <h3 class="font-bold text-base text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-file-pen text-amber-500"></i> Form Pengajuan Izin Mandiri</h3>
+                <h3 class="font-bold text-base text-indigo-900 flex items-center gap-2"><i class="fa-solid fa-file-pen text-amber-500"></i> Form Pengajuan & Pembatalan Izin</h3>
                 <button onclick="closeStudentPermitModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <p class="text-xs text-slate-500">Formulir ini otomatis memperbarui status kehadiran harian Anda dan langsung tampil pada Widget Status Kelas.</p>
+            <p class="text-xs text-slate-500">Pilih nama Anda untuk mengajukan izin atau membatalkan pengiriman izin (mengubah status kembali menjadi Hadir).</p>
             <div>
                 <label class="block text-xs font-semibold mb-1">Pilih Nama Anda (Sesuai Absensi)</label>
-                <select id="permitStudentSelect" class="w-full px-3 py-2 border rounded-lg text-xs font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
+                <select id="permitStudentSelect" onchange="onPermitStudentChange()" class="w-full px-3 py-2 border rounded-lg text-xs font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
                     <!-- Diisi otomatis dari daftar mahasiswa -->
                 </select>
             </div>
+            <!-- Info Status Saat Ini -->
+            <div id="currentPermitStatusInfo" class="bg-slate-100 px-3 py-2 rounded-lg text-xs font-medium text-slate-700">
+                Status Harian Saat Ini: <strong id="statusDisplayBadge" class="text-emerald-600">-</strong>
+            </div>
             <div>
-                <label class="block text-xs font-semibold mb-1">Status Ketidakhadiran</label>
+                <label class="block text-xs font-semibold mb-1">Ubah Status Ketidakhadiran</label>
                 <select id="permitStatus" class="w-full px-3 py-2 border rounded-lg text-xs font-semibold bg-slate-50 focus:ring-2 focus:ring-indigo-500">
                     <option value="Izin">Izin (Ada Keperluan)</option>
                     <option value="Sakit">Sakit</option>
@@ -318,11 +322,17 @@
             </div>
             <div>
                 <label class="block text-xs font-semibold mb-1">Alasan / Keterangan Tambahan</label>
-                <textarea id="permitReason" rows="3" placeholder="Contoh: Kurang enak badan / menghadiri acara keluarga..." class="w-full px-3 py-2 border rounded-lg text-xs"></textarea>
+                <textarea id="permitReason" rows="2" placeholder="Contoh: Kurang enak badan / menghadiri acara keluarga..." class="w-full px-3 py-2 border rounded-lg text-xs"></textarea>
             </div>
-            <div class="flex justify-end space-x-2 pt-3 border-t">
-                <button type="button" onclick="closeStudentPermitModal()" class="px-4 py-2 border rounded-lg text-xs">Batal</button>
-                <button type="button" onclick="submitStudentPermit()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow">Kirim Izin Sekarang</button>
+            <div class="flex items-center justify-between pt-3 border-t">
+                <!-- TOMBOL BATALKAN / HAPUS IZIN -->
+                <button type="button" onclick="cancelStudentPermit()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-left"></i> Batalkan Izin (Set Hadir)
+                </button>
+                <div class="flex space-x-2">
+                    <button type="button" onclick="closeStudentPermitModal()" class="px-3 py-2 border rounded-lg text-xs">Tutup</button>
+                    <button type="button" onclick="submitStudentPermit()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow">Kirim Izin</button>
+                </div>
             </div>
         </div>
     </div>
@@ -706,7 +716,6 @@
                 authContainer.innerHTML = `<button id="btnLogoutTop" class="bg-indigo-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700">Logout</button>`;
                 document.getElementById('btnLogoutTop').addEventListener('click', async () => { await signOut(auth); });
                 
-                // Tampilkan tombol izin mandiri untuk semua mahasiswa yang login Google
                 btnStudentPermit.classList.remove('hidden');
                 btnStudentPermit.classList.add('flex');
 
@@ -895,9 +904,10 @@
             }
         }
 
-        // FUNGSI FORM IZIN MANDIRI MAHASISWA
+        // FUNGSI FORM IZIN MANDIRI & PEMBATALAN
         window.openStudentPermitModal = function() {
             document.getElementById('permitReason').value = "";
+            populatePermitStudentDropdown();
             document.getElementById('studentPermitModal').classList.remove('hidden');
         }
 
@@ -915,12 +925,23 @@
                     select.value = matched.id;
                 }
             }
+            onPermitStudentChange();
+        }
+
+        window.onPermitStudentChange = function() {
+            const studentId = document.getElementById('permitStudentSelect').value;
+            let s = cachedStudents.find(x => x.id === studentId);
+            const statusDisplay = document.getElementById('statusDisplayBadge');
+            if (s) {
+                let att = s.attendance || 'Hadir';
+                statusDisplay.innerText = att;
+                statusDisplay.className = `font-bold ${att === 'Hadir' ? 'text-emerald-600' : 'text-amber-600'}`;
+            }
         }
 
         window.submitStudentPermit = async function() {
             const studentId = document.getElementById('permitStudentSelect').value;
             const statusVal = document.getElementById('permitStatus').value;
-            const reason = document.getElementById('permitReason').value;
 
             if (!studentId) return alert("Pilih nama mahasiswa terlebih dahulu!");
 
@@ -930,11 +951,30 @@
                 renderAttendance();
                 renderStudents();
                 updateAbsentSummaryWidget();
+                onPermitStudentChange();
                 
                 await setDoc(doc(db, "students_v7_kelasF", s.id), s);
                 
-                closeStudentPermitModal();
-                alert(`Pengajuan izin untuk ${s.name} sebagai "${statusVal}" berhasil dikirim dan langsung terhubung ke Widget Status Kelas!`);
+                alert(`Pengajuan izin untuk ${s.name} sebagai "${statusVal}" berhasil dikirim!`);
+            }
+        }
+
+        // FUNGSI MEMBATALKAN / MENGHAPUS IZIN (KEMBALI HADIR)
+        window.cancelStudentPermit = async function() {
+            const studentId = document.getElementById('permitStudentSelect').value;
+            if (!studentId) return alert("Pilih nama mahasiswa terlebih dahulu!");
+
+            let s = cachedStudents.find(x => x.id === studentId);
+            if (s) {
+                s.attendance = 'Hadir';
+                renderAttendance();
+                renderStudents();
+                updateAbsentSummaryWidget();
+                onPermitStudentChange();
+
+                await setDoc(doc(db, "students_v7_kelasF", s.id), s);
+                
+                alert(`Pengiriman izin untuk ${s.name} berhasil dibatalkan. Status dikembalikan menjadi Hadir.`);
             }
         }
 
